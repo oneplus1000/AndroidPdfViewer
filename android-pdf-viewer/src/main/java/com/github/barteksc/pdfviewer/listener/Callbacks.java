@@ -74,6 +74,8 @@ public class Callbacks {
      */
     private LinkHandler linkHandler;
 
+    private OnPageZoomListener onPageZoomListener;
+
     public void setOnLoadComplete(OnLoadCompleteListener onLoadCompleteListener) {
         this.onLoadCompleteListener = onLoadCompleteListener;
     }
@@ -176,5 +178,18 @@ public class Callbacks {
         if (linkHandler != null) {
             linkHandler.handleLinkEvent(event);
         }
+    }
+
+    public void setOnPageZoom(OnPageZoomListener listener) {
+        if(listener != null){
+            this.onPageZoomListener = listener;
+        }
+    }
+
+    public void callOnPageZoom(float centerX, float centerY, float zoomFrom, float zoomTo){
+        if(this.onPageZoomListener == null){
+            return;
+        }
+        this.onPageZoomListener.zoom(centerX, centerY, zoomFrom, zoomTo);
     }
 }

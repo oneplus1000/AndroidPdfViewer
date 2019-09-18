@@ -47,6 +47,7 @@ import com.github.barteksc.pdfviewer.listener.OnLongPressListener;
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.github.barteksc.pdfviewer.listener.OnPageErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnPageScrollListener;
+import com.github.barteksc.pdfviewer.listener.OnPageZoomListener;
 import com.github.barteksc.pdfviewer.listener.OnRenderListener;
 import com.github.barteksc.pdfviewer.listener.OnTapListener;
 import com.github.barteksc.pdfviewer.model.PagePart;
@@ -1377,6 +1378,8 @@ public class PDFView extends RelativeLayout {
 
         private boolean nightMode = false;
 
+        private OnPageZoomListener onPageZoomListener;
+
         private Configurator(DocumentSource documentSource) {
             this.documentSource = documentSource;
         }
@@ -1521,6 +1524,11 @@ public class PDFView extends RelativeLayout {
             return this;
         }
 
+        public Configurator onPageZoom(OnPageZoomListener onPageZoomListener) {
+            this.onPageZoomListener = onPageZoomListener;
+            return this;
+        }
+
         public void load() {
             if (!hasSize) {
                 waitingDocumentConfigurator = this;
@@ -1538,6 +1546,7 @@ public class PDFView extends RelativeLayout {
             PDFView.this.callbacks.setOnLongPress(onLongPressListener);
             PDFView.this.callbacks.setOnPageError(onPageErrorListener);
             PDFView.this.callbacks.setLinkHandler(linkHandler);
+            PDFView.this.callbacks.setOnPageZoom(onPageZoomListener);
             PDFView.this.setSwipeEnabled(enableSwipe);
             PDFView.this.setNightMode(nightMode);
             PDFView.this.enableDoubletap(enableDoubletap);
