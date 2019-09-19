@@ -33,6 +33,8 @@ import android.widget.OverScroller;
  */
 class AnimationManager {
 
+    private static final long ANIMATE_DURATION = 200;
+
     private PDFView pdfView;
 
     private ValueAnimator animation;
@@ -55,7 +57,7 @@ class AnimationManager {
         animation.setInterpolator(new DecelerateInterpolator());
         animation.addUpdateListener(xAnimation);
         animation.addListener(xAnimation);
-        animation.setDuration(400);
+        animation.setDuration(ANIMATE_DURATION);
         animation.start();
     }
 
@@ -66,7 +68,7 @@ class AnimationManager {
         animation.setInterpolator(new DecelerateInterpolator());
         animation.addUpdateListener(yAnimation);
         animation.addListener(yAnimation);
-        animation.setDuration(400);
+        animation.setDuration(ANIMATE_DURATION);
         animation.start();
     }
 
@@ -77,7 +79,7 @@ class AnimationManager {
         ZoomAnimation zoomAnim = new ZoomAnimation(centerX, centerY);
         animation.addUpdateListener(zoomAnim);
         animation.addListener(zoomAnim);
-        animation.setDuration(400);
+        animation.setDuration(ANIMATE_DURATION);
         animation.start();
     }
 
