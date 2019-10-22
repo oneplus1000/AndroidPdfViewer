@@ -747,6 +747,7 @@ public class PDFView extends RelativeLayout {
 
         pagesLoader.loadPages();
         redraw();
+
     }
 
     /** Called when the PDF is loaded */
@@ -805,6 +806,7 @@ public class PDFView extends RelativeLayout {
 
         if (part.isThumbnail()) {
             cacheManager.cacheThumbnail(part);
+            //cacheManager.cachePart(part);
         } else {
             cacheManager.cachePart(part);
         }

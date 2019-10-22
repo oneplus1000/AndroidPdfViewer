@@ -18,6 +18,7 @@ package com.github.barteksc.pdfviewer;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 
 import com.github.barteksc.pdfviewer.exception.PageRenderingException;
@@ -117,7 +118,7 @@ class PdfFile {
     public void recalculatePageSizes(Size viewSize) {
         pageSizes.clear();
         PageSizeCalculator calculator = new PageSizeCalculator(pageFitPolicy, originalMaxWidthPageSize,
-                originalMaxHeightPageSize, viewSize, fitEachPage);
+                originalMaxHeightPageSize, viewSize,  fitEachPage);
         maxWidthPageSize = calculator.getOptimalMaxWidthPageSize();
         maxHeightPageSize = calculator.getOptimalMaxHeightPageSize();
 
@@ -247,7 +248,9 @@ class PdfFile {
             float maxWidth = getMaxPageWidth();
             return zoom * (maxWidth - pageSize.getWidth()) / 2; //x
         } else {
+
             float maxHeight = getMaxPageHeight();
+            //Log.d("XXX","zoom"+zoom+" * (maxHeight:"+maxHeight+" - pageSize.getHeight() "+pageSize.getHeight()+") / 2");
             return zoom * (maxHeight - pageSize.getHeight()) / 2; //y
         }
     }

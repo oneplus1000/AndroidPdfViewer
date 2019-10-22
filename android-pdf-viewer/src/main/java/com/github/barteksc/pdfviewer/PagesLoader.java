@@ -16,6 +16,7 @@
 package com.github.barteksc.pdfviewer;
 
 import android.graphics.RectF;
+import android.util.Log;
 
 import com.github.barteksc.pdfviewer.util.Constants;
 import com.github.barteksc.pdfviewer.util.MathUtils;
@@ -211,9 +212,10 @@ class PagesLoader {
                 range.rightBottom.row = MathUtils.ceil(Math.abs(pageLastYOffset - pdfView.pdfFile.getPageOffset(range.page, pdfView.getZoom())) / rowHeight);
                 range.rightBottom.col = MathUtils.floor(MathUtils.min(pageLastXOffset - secondaryOffset, 0) / colWidth);
             } else {
-                range.leftTop.col = MathUtils.floor(Math.abs(pageFirstXOffset - pdfView.pdfFile.getPageOffset(range.page, pdfView.getZoom())) / colWidth);
-                range.leftTop.row = MathUtils.floor(MathUtils.min(pageFirstYOffset - secondaryOffset, 0) / rowHeight);
 
+                range.leftTop.col = MathUtils.floor(Math.abs(pageFirstXOffset - pdfView.pdfFile.getPageOffset(range.page, pdfView.getZoom())) / colWidth);
+                range.leftTop.row = MathUtils.floor(MathUtils.min(pageFirstYOffset - Math.abs(secondaryOffset), 0) / rowHeight);
+                //Log.d("XXX","aaaaaa:"+range.leftTop.row  +" pageFirstYOffset:"+pageFirstYOffset  + " secondaryOffset:" + secondaryOffset + "result:"+MathUtils.min(pageFirstYOffset - secondaryOffset, 0));
                 range.rightBottom.col = MathUtils.floor(Math.abs(pageLastXOffset - pdfView.pdfFile.getPageOffset(range.page, pdfView.getZoom())) / colWidth);
                 range.rightBottom.row = MathUtils.floor(MathUtils.min(pageLastYOffset - secondaryOffset, 0) / rowHeight);
             }
@@ -252,6 +254,7 @@ class PagesLoader {
                          int nbOfPartsLoadable) {
         int loaded = 0;
         for (int row = firstRow; row <= lastRow; row++) {
+            //Log.d("RenderingHandler","int page:"+page+", int row:"+row+"");
             for (int col = firstCol; col <= lastCol; col++) {
                 if (loadCell(page, row, col, pageRelativePartWidth, pageRelativePartHeight)) {
                     loaded++;
@@ -265,6 +268,8 @@ class PagesLoader {
     }
 
     private boolean loadCell(int page, int row, int col, float pageRelativePartWidth, float pageRelativePartHeight) {
+
+        //Log.d("RenderingHandler","int page:"+page+", int row:"+row+", int col"+col+", float pageRelativePartWidth:"+pageRelativePartWidth+", float pageRelativePartHeight:"+pageRelativePartHeight+" ");
 
         float relX = pageRelativePartWidth * col;
         float relY = pageRelativePartHeight * row;
