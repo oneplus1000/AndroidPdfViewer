@@ -128,7 +128,7 @@ public class PDFView extends RelativeLayout {
 
     /** The index of the current sequence */
     private int currentPage;
-
+    private int currentPageJumpTo;
     /**
      * If you picture all the pages side by side in their optimal width,
      * and taking into account the zoom level, the current offset is the
@@ -287,10 +287,11 @@ public class PDFView extends RelativeLayout {
      * @param page Page index.
      */
     public void jumpTo(int page, boolean withAnimation) {
+        currentPageJumpTo = page;
         if (pdfFile == null) {
             return;
         }
-
+        //Log.d("YYY","Z page->"+page);
         page = pdfFile.determineValidPageNumberFrom(page);
         float offset = page == 0 ? 0 : -pdfFile.getPageOffset(page, zoom);
         offset += pdfFile.getPageSpacing(page, getZoom()) / 2f;
@@ -323,6 +324,7 @@ public class PDFView extends RelativeLayout {
         // difference between UserPages and DocumentPages
         pageNb = pdfFile.determineValidPageNumberFrom(pageNb);
         currentPage = pageNb;
+        currentPageJumpTo = pageNb;
 
         loadPages();
 
@@ -355,6 +357,7 @@ public class PDFView extends RelativeLayout {
      * @see PDFView#getPositionOffset()
      */
     public void setPositionOffset(float progress, boolean moveHandle) {
+        //currentYOffset = 0;
         if (swipeVertical) {
             moveTo(currentXOffset, (-pdfFile.getDocLen(zoom) + getHeight()) * progress, moveHandle);
         } else {
@@ -500,7 +503,7 @@ public class PDFView extends RelativeLayout {
             relativeCenterPointInStripYOffset = centerPointInStripYOffset / pdfFile.getDocLen(zoom);
         }else {
             relativeCenterPointInStripXOffset = centerPointInStripXOffset / pdfFile.getDocLen(zoom);
-            relativeCenterPointInStripYOffset = centerPointInStripYOffset / pdfFile.getMaxPageHeight();
+            relativeCenterPointInStripYOffset = centerPointInStripYOffset / pdfFile.getMaxPageHeight(currentPageJumpTo);
         }
 
         animationManager.stopAll();
@@ -511,8 +514,9 @@ public class PDFView extends RelativeLayout {
             currentYOffset = -relativeCenterPointInStripYOffset * pdfFile.getDocLen(zoom) + h * 0.5f ;
         }else {
             currentXOffset = -relativeCenterPointInStripXOffset * pdfFile.getDocLen(zoom) + w * 0.5f;
-            currentYOffset = -relativeCenterPointInStripYOffset * pdfFile.getMaxPageHeight() + h * 0.5f;
+            currentYOffset = -relativeCenterPointInStripYOffset * pdfFile.getMaxPageHeight(currentPageJumpTo) + h * 0.5f;
         }
+        //currentYOffset = 0;
         moveTo(currentXOffset,currentYOffset);
         loadPageByOffset();
     }
@@ -554,7 +558,7 @@ public class PDFView extends RelativeLayout {
         } else {
             if (direction < 0 && currentYOffset < 0) {
                 return true;
-            } else if (direction > 0 && currentYOffset + toCurrentScale(pdfFile.getMaxPageHeight()) > getHeight()) {
+            } else if (direction > 0 && currentYOffset + toCurrentScale(pdfFile.getMaxPageHeight(currentPageJumpTo)) > getHeight()) {
                 return true;
             }
         }
@@ -619,6 +623,7 @@ public class PDFView extends RelativeLayout {
         // Moves the canvas before drawing any element
         float currentXOffset = this.currentXOffset;
         float currentYOffset = this.currentYOffset;
+        //Log.d("YYY","currentYOffset:"+currentYOffset);
         canvas.translate(currentXOffset, currentYOffset);
 
         // Draws thumbnails
@@ -648,6 +653,7 @@ public class PDFView extends RelativeLayout {
     }
 
     private void drawWithListener(Canvas canvas, int page, OnDrawListener listener) {
+
         if (listener != null) {
             float translateX, translateY;
             if (swipeVertical) {
@@ -690,9 +696,12 @@ public class PDFView extends RelativeLayout {
             localTranslationX = toCurrentScale(maxWidth - size.getWidth()) / 2;
         } else {
             localTranslationX = pdfFile.getPageOffset(part.getPage(), zoom);
-            float maxHeight = pdfFile.getMaxPageHeight();
+            float maxHeight = pdfFile.getMaxPageHeight(currentPageJumpTo);
             localTranslationY = toCurrentScale(maxHeight - size.getHeight()) / 2;
         }
+        //Log.d("YYY","localTranslationY ="+localTranslationY);
+        //localTranslationY = 889;
+        //canvas.translate(localTranslationX, localTranslationY);
         canvas.translate(localTranslationX, localTranslationY);
 
         Rect srcRect = new Rect(0, 0, renderedBitmap.getWidth(),
@@ -860,7 +869,9 @@ public class PDFView extends RelativeLayout {
             }
         } else {
             // Check Y offset
-            float scaledPageHeight = toCurrentScale(pdfFile.getMaxPageHeight());
+
+            float scaledPageHeight = toCurrentScale(pdfFile.getMaxPageHeight(currentPageJumpTo));
+            //Log.d("YYY","A scaledPageHeight: "+scaledPageHeight + "  currentPageJumpTo:"+currentPageJumpTo + "  >> "+ getCurrentPage());
             if (scaledPageHeight < getHeight()) {
                 offsetY = getHeight() / 2 - scaledPageHeight / 2;
             } else {
@@ -894,6 +905,7 @@ public class PDFView extends RelativeLayout {
 
         currentXOffset = offsetX;
         currentYOffset = offsetY;
+        //Log.d("YYY","moveTo offsetY:"+offsetY);
         float positionOffset = getPositionOffset();
 
         if (moveHandle && scrollHandle != null && !documentFitsView()) {
@@ -918,7 +930,7 @@ public class PDFView extends RelativeLayout {
             offset = currentXOffset;
             screenCenter = ((float) getWidth()) / 2;
         }
-
+        //offset = 0;
         int page = pdfFile.getPageAtOffset(-(offset - screenCenter), zoom);
 
         if (page >= 0 && page <= pdfFile.getPagesCount() - 1 && page != getCurrentPage()) {
@@ -944,6 +956,7 @@ public class PDFView extends RelativeLayout {
         float offset = snapOffsetForPage(centerPage, edge);
         if (swipeVertical) {
             animationManager.startYAnimation(currentYOffset, -offset);
+            //animationManager.startYAnimation(0, -0);
         } else {
             animationManager.startXAnimation(currentXOffset, -offset);
         }

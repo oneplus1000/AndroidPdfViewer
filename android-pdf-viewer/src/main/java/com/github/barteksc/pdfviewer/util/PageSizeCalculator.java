@@ -15,6 +15,8 @@
  */
 package com.github.barteksc.pdfviewer.util;
 
+import android.util.Log;
+
 import com.shockwave.pdfium.util.Size;
 import com.shockwave.pdfium.util.SizeF;
 
@@ -74,11 +76,14 @@ public class PageSizeCalculator {
             case BOTH:
                 SizeF localOptimalMaxWidth = fitBoth(originalMaxWidthPageSize, viewSize.getWidth(), viewSize.getHeight());
                 float localWidthRatio = localOptimalMaxWidth.getWidth() / originalMaxWidthPageSize.getWidth();
+                //SizeF optimalMaxHeightPageSize2 = fitHeight(originalMaxHeightPageSize, viewSize.getHeight());
+                //SizeF optimalMaxWidthPageSize3 = fitWidth(originalMaxWidthPageSize, viewSize.getWidth());
                 this.optimalMaxHeightPageSize = fitBoth(originalMaxHeightPageSize, originalMaxHeightPageSize.getWidth() * localWidthRatio,
                         viewSize.getHeight());
                 heightRatio = optimalMaxHeightPageSize.getHeight() / originalMaxHeightPageSize.getHeight();
                 optimalMaxWidthPageSize = fitBoth(originalMaxWidthPageSize, viewSize.getWidth(), originalMaxWidthPageSize.getHeight() * heightRatio);
                 widthRatio = optimalMaxWidthPageSize.getWidth() / originalMaxWidthPageSize.getWidth();
+                //Log.d("YYY","optimalMaxWidthPageSize ="+optimalMaxWidthPageSize.getHeight()+ " optimalMaxHeightPageSize2="+optimalMaxHeightPageSize2.getHeight() +  " optimalMaxWidthPageSize3:"+optimalMaxWidthPageSize3.getHeight());
                 break;
             default:
                 optimalMaxWidthPageSize = fitWidth(originalMaxWidthPageSize, viewSize.getWidth());

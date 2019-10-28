@@ -156,14 +156,18 @@ class PdfFile {
      */
     public SizeF getMaxPageSize() {
         return isVertical ? maxWidthPageSize : maxHeightPageSize;
+        //return isVertical ? maxWidthPageSize : new SizeF(maxHeightPageSize.getWidth(),1553f);
     }
 
     public float getMaxPageWidth() {
         return getMaxPageSize().getWidth();
     }
 
-    public float getMaxPageHeight() {
-        return getMaxPageSize().getHeight();
+    public float getMaxPageHeight(int index) {
+        //return 1553f;
+        Log.d("YYY","  index: "+index + "  getHeight: " + getPageSize(index).getHeight());
+        return getPageSize(index).getHeight();
+        //return getMaxPageSize().getHeight();
     }
 
     private void prepareAutoSpacing(Size viewSize) {
@@ -249,7 +253,7 @@ class PdfFile {
             return zoom * (maxWidth - pageSize.getWidth()) / 2; //x
         } else {
 
-            float maxHeight = getMaxPageHeight();
+            float maxHeight = getMaxPageHeight(pageIndex);
             //Log.d("XXX","zoom"+zoom+" * (maxHeight:"+maxHeight+" - pageSize.getHeight() "+pageSize.getHeight()+") / 2");
             return zoom * (maxHeight - pageSize.getHeight()) / 2; //y
         }
