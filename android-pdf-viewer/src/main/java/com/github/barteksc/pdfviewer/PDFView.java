@@ -869,9 +869,9 @@ public class PDFView extends RelativeLayout {
             }
         } else {
             // Check Y offset
-
-            float scaledPageHeight = toCurrentScale(pdfFile.getMaxPageHeight(currentPageJumpTo));
-            //Log.d("YYY","A scaledPageHeight: "+scaledPageHeight + "  currentPageJumpTo:"+currentPageJumpTo + "  >> "+ getCurrentPage());
+            float h = pdfFile.getMaxPageHeight(currentPageJumpTo);
+            float scaledPageHeight = toCurrentScale(h);
+            //Log.d("YYY", "currentPageJumpTo: "+currentPageJumpTo + " scaledPageHeight: "+scaledPageHeight + " offsetX: "+offsetX + " scrollDir:"+scrollDir);
             if (scaledPageHeight < getHeight()) {
                 offsetY = getHeight() / 2 - scaledPageHeight / 2;
             } else {
@@ -913,7 +913,6 @@ public class PDFView extends RelativeLayout {
         }
 
         callbacks.callOnPageScroll(getCurrentPage(), positionOffset);
-
         redraw();
     }
 

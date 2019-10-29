@@ -165,9 +165,13 @@ class PdfFile {
 
     public float getMaxPageHeight(int index) {
         //return 1553f;
-        Log.d("YYY","  index: "+index + "  getHeight: " + getPageSize(index).getHeight());
-        return getPageSize(index).getHeight();
+        //Log.d("YYY","  index: "+index + "  getHeight: " + getPageSize(index).getHeight());
+        //return getPageSize(index).getHeight();
         //return getMaxPageSize().getHeight();
+        if( getPageSize(index).getHeight() >  getMaxPageSize().getHeight()){
+            return getPageSize(index).getHeight();
+        }
+        return getMaxPageSize().getHeight();
     }
 
     private void prepareAutoSpacing(Size viewSize) {
