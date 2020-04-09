@@ -242,10 +242,24 @@ public class PDFView extends RelativeLayout {
     /** Holds last used Configurator that should be loaded when view has size */
     private Configurator waitingDocumentConfigurator;
 
+    /** autoDispose == true resource will free when 'onDetachedFromWindow' */
+    private boolean autoDispose = true;
+
+
+    /** Construct the initial view */
+    public PDFView(Context context, boolean autoDispose,AttributeSet set) {
+        super(context, set);
+        this.autoDispose = autoDispose;
+        initPDFView(context);
+    }
+
     /** Construct the initial view */
     public PDFView(Context context, AttributeSet set) {
         super(context, set);
+        initPDFView(context);
+    }
 
+    private void initPDFView(Context context){
         renderingHandlerThread = new HandlerThread("PDF renderer");
 
         if (isInEditMode()) {
@@ -469,6 +483,13 @@ public class PDFView extends RelativeLayout {
 
     @Override
     protected void onDetachedFromWindow() {
+        if(this.autoDispose) {
+            this.dispose();
+        }
+        super.onDetachedFromWindow();
+    }
+
+    public void dispose(){
         recycle();
         if (renderingHandlerThread != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
@@ -478,7 +499,6 @@ public class PDFView extends RelativeLayout {
             }
             renderingHandlerThread = null;
         }
-        super.onDetachedFromWindow();
     }
 
     @Override
