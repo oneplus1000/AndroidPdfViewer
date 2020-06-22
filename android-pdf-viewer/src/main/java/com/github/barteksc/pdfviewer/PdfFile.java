@@ -341,6 +341,17 @@ class PdfFile {
         originalUserPages = null;
     }
 
+    private void printDebug(String title){
+        StackTraceElement[] eles = Thread.currentThread().getStackTrace();
+        if(eles == null){
+            return;
+        }
+        Log.d("printDebug","-----------"+title+"------------");
+        for(StackTraceElement ele : eles){
+            Log.d("printDebug",ele.getMethodName());
+        }
+    }
+
     /**
      * Given the UserPage number, this method restrict it
      * to be sure it's an existing page. It takes care of

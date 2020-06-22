@@ -86,6 +86,10 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
     }
 
     private boolean checkLinkTapped(float x, float y) {
+        /*
+        ปิดไว้เพราะใน getPageLinks มี lock ซึ่งควรไปทำใน background thread (pdfview มีการใช้ lock ตัวนี้ใน background thread เยอะ )
+        ไม่งั้น ui thread มีโอกาสค้างถ้าเกิด background thread ทำงานหนักๆ  func นี้นะ pdfFile.getPageLinks(page)
+
         PdfFile pdfFile = pdfView.pdfFile;
         if (pdfFile == null) {
             return false;
@@ -102,6 +106,8 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
             pageY = (int) pdfFile.getSecondaryPageOffset(page, pdfView.getZoom());
             pageX = (int) pdfFile.getPageOffset(page, pdfView.getZoom());
         }
+
+
         for (PdfDocument.Link link : pdfFile.getPageLinks(page)) {
             RectF mapped = pdfFile.mapRectToDevice(page, pageX, pageY, (int) pageSize.getWidth(),
                     (int) pageSize.getHeight(), link.getBounds());
@@ -110,7 +116,7 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
                 pdfView.callbacks.callLinkHandler(new LinkTapEvent(x, y, mappedX, mappedY, mapped, link));
                 return true;
             }
-        }
+        }*/
         return false;
     }
 
