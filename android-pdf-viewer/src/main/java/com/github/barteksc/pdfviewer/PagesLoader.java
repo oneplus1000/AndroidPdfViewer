@@ -306,11 +306,15 @@ class PagesLoader {
         float thumbnailWidth = pageSize.getWidth() * Constants.THUMBNAIL_RATIO;
         float thumbnailHeight = pageSize.getHeight() * Constants.THUMBNAIL_RATIO;
         if (!pdfView.cacheManager.containsThumbnail(page, thumbnailRect)) {
+
+            pdfView.renderingHandler.addRenderingTaskForPlaceHolder(page,thumbnailWidth, thumbnailHeight, thumbnailRect);
             pdfView.renderingHandler.addRenderingTask(page,
                     thumbnailWidth, thumbnailHeight, thumbnailRect,
                     true, 0, pdfView.isBestQuality(), pdfView.isAnnotationRendering());
         }
     }
+
+
 
     void loadPages() {
         cacheOrder = 1;

@@ -30,6 +30,10 @@ public class PagePart {
 
     private int cacheOrder;
 
+
+
+    private boolean isPlaceHolder = false;
+
     public PagePart(int page, Bitmap renderedBitmap, RectF pageRelativeBounds, boolean thumbnail, int cacheOrder) {
         super();
         this.page = page;
@@ -38,6 +42,15 @@ public class PagePart {
         this.thumbnail = thumbnail;
         this.cacheOrder = cacheOrder;
     }
+
+    public boolean isPlaceHolder() {
+        return isPlaceHolder;
+    }
+
+    public void setPlaceHolder(boolean placeHolder) {
+        isPlaceHolder = placeHolder;
+    }
+
 
     public int getCacheOrder() {
         return cacheOrder;

@@ -60,10 +60,31 @@ class RenderingHandler extends Handler {
         sendMessage(msg);
     }
 
+    void addRenderingTaskForPlaceHolder(int page, float width, float height, RectF bounds) {
+        RenderingTask task = new RenderingTask(width, height, bounds, page, false, 0, false, false);
+        task.isPlaceHolder = true;
+        try {
+            final PagePart part = proceedPlaceHolder(task);
+            pdfView.post(new Runnable() {
+                @Override
+                public void run() {
+                    pdfView.onBitmapRendered(part);
+                }
+            });
+
+        } catch (PageRenderingException e) {
+            e.printStackTrace();
+        }
+        //Message msg = obtainMessage(MSG_RENDER_TASK, task);
+        //Log.d("xx","---- loadThumbnail"+page);
+        //sendMessage(msg);
+    }
+
     @Override
     public void handleMessage(Message message) {
 
         RenderingTask task = (RenderingTask) message.obj;
+        //Log.d("xx", "\thandleMessage" + task.page);
         try {
             final PagePart part = proceed(task);
             if (part != null) {
@@ -71,9 +92,6 @@ class RenderingHandler extends Handler {
                     pdfView.post(new Runnable() {
                         @Override
                         public void run() {
-                            //if( part.getPage() == 222 ) {
-                             //   Log.d(TAG, "part.getPage():" + part.getPage() + " getCacheOrder:" + part.getCacheOrder() + " isThumbnail:" + part.isThumbnail());
-                            //}
                             pdfView.onBitmapRendered(part);
                         }
                     });
@@ -91,6 +109,16 @@ class RenderingHandler extends Handler {
         }
     }
 
+    private PagePart proceedPlaceHolder(RenderingTask renderingTask) throws PageRenderingException {
+
+        PagePart part = new PagePart(renderingTask.page, null,
+                renderingTask.bounds, renderingTask.thumbnail,
+                renderingTask.cacheOrder);
+        part.setPlaceHolder(true);
+
+        return part;
+    }
+
     private PagePart proceed(RenderingTask renderingTask) throws PageRenderingException {
         PdfFile pdfFile = pdfView.pdfFile;
         pdfFile.openPage(renderingTask.page);
@@ -99,7 +127,7 @@ class RenderingHandler extends Handler {
         int h = Math.round(renderingTask.height);
 
         if (w == 0 || h == 0 || pdfFile.pageHasError(renderingTask.page)) {
-            Log.d(TAG,"error");
+            Log.d(TAG, "error");
             return null;
         }
 
@@ -153,6 +181,8 @@ class RenderingHandler extends Handler {
         boolean bestQuality;
 
         boolean annotationRendering;
+
+        boolean isPlaceHolder = false;
 
         RenderingTask(float width, float height, RectF bounds, int page, boolean thumbnail, int cacheOrder, boolean bestQuality, boolean annotationRendering) {
             this.page = page;

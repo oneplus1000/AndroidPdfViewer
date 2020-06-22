@@ -39,6 +39,8 @@ class CacheManager {
 
     private final List<PagePart> thumbnails;
 
+    private final List<PagePart> placeHolders;
+
     private final Object passiveActiveLock = new Object();
 
     private final PagePartComparator orderComparator = new PagePartComparator();
@@ -46,6 +48,7 @@ class CacheManager {
     public CacheManager() {
         activeCache = new PriorityQueue<>(CACHE_SIZE, orderComparator);
         passiveCache = new PriorityQueue<>(CACHE_SIZE, orderComparator);
+        placeHolders =  new ArrayList<>();
         thumbnails = new ArrayList<>();
     }
 
@@ -90,6 +93,18 @@ class CacheManager {
 
             // Then add thumbnail
             addWithoutDuplicates(thumbnails, part);
+        }
+
+    }
+
+    public void cachePlaceHolders(PagePart part) {
+        synchronized (this.placeHolders) {
+            for(PagePart placeHolder : this.placeHolders){
+                if(placeHolder.getPage() == part.getPage()){
+                    return;
+                }
+            }
+            this.placeHolders.add(part);
         }
 
     }
@@ -162,6 +177,12 @@ class CacheManager {
         }
     }
 
+    public List<PagePart> getPlaceHolders(){
+        synchronized (placeHolders) {
+            return placeHolders;
+        }
+    }
+
     public void recycle() {
         synchronized (passiveActiveLock) {
             for (PagePart part : passiveCache) {
@@ -178,6 +199,9 @@ class CacheManager {
                 part.getRenderedBitmap().recycle();
             }
             thumbnails.clear();
+        }
+        synchronized (placeHolders) {
+            placeHolders.clear();
         }
     }
 
