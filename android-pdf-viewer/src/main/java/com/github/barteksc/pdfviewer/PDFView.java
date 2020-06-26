@@ -19,6 +19,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
@@ -470,6 +471,10 @@ public class PDFView extends RelativeLayout {
         } else {
             paint.setColorFilter(null);
         }
+    }
+
+    public void setColorFilter(ColorFilter colorFilter){
+        paint.setColorFilter(colorFilter);
     }
 
     void enableDoubletap(boolean enableDoubletap) {
@@ -1566,6 +1571,8 @@ public class PDFView extends RelativeLayout {
 
         private boolean nightMode = false;
 
+        private ColorFilter colorFilter = null;
+
         private OnPageZoomListener onPageZoomListener;
 
         private Configurator(DocumentSource documentSource) {
@@ -1707,6 +1714,11 @@ public class PDFView extends RelativeLayout {
             return this;
         }
 
+        public Configurator setColorFilter(ColorFilter colorFilter){
+            this.colorFilter = colorFilter;
+            return this;
+        }
+
         public Configurator disableLongpress() {
             PDFView.this.dragPinchManager.disableLongpress();
             return this;
@@ -1749,6 +1761,7 @@ public class PDFView extends RelativeLayout {
             PDFView.this.setFitEachPage(fitEachPage);
             PDFView.this.setPageSnap(pageSnap);
             PDFView.this.setPageFling(pageFling);
+            PDFView.this.setColorFilter(colorFilter);
 
             if (pageNumbers != null) {
                 PDFView.this.load(documentSource, password, pageNumbers);
