@@ -294,7 +294,10 @@ public class PDFView extends RelativeLayout {
      */
     private boolean autoDispose = true;
 
-
+    /**
+     * placeHoldColor is color when pdf loading
+     * */
+    private int placeHoldColor = Color.WHITE;
     /**
      * Construct the initial view
      */
@@ -302,6 +305,10 @@ public class PDFView extends RelativeLayout {
         super(context, set);
         this.autoDispose = autoDispose;
         initPDFView(context);
+    }
+
+    public void setPlaceHoldColor(int color){
+        this.placeHoldColor = color;
     }
 
     /**
@@ -330,7 +337,8 @@ public class PDFView extends RelativeLayout {
 
         placeHoldPaint= new Paint();
         placeHoldPaint.setStyle(Style.FILL);
-        placeHoldPaint.setColor(Color.WHITE);
+        placeHoldPaint.setColor(this.placeHoldColor); //set สีของที่โล่งด้นหลัง เวลายังโหลดไม่เสร็จ
+        //placeHoldPaint.setColor(Color.GREEN);
 
         pdfiumCore = new PdfiumCore(context);
         setWillNotDraw(false);
@@ -345,7 +353,7 @@ public class PDFView extends RelativeLayout {
         if (!recycled) {
             throw new IllegalStateException("Don't call load on a PDF View without recycling it first.");
         }
-
+        placeHoldPaint.setColor(this.placeHoldColor);
         recycled = false;
         // Start decoding document
         decodingAsyncTask = new DecodingAsyncTask(docSource, password, userPages, this, pdfiumCore);
@@ -1573,6 +1581,8 @@ public class PDFView extends RelativeLayout {
 
         private ColorFilter colorFilter = null;
 
+        //private int placeHoldColor = Color.WHITE;
+
         private OnPageZoomListener onPageZoomListener;
 
         private Configurator(DocumentSource documentSource) {
@@ -1719,6 +1729,12 @@ public class PDFView extends RelativeLayout {
             return this;
         }
 
+        /*
+        public Configurator setPlaceHoldColor(int color){
+            this.placeHoldColor = color;
+            return this;
+        }*/
+
         public Configurator disableLongpress() {
             PDFView.this.dragPinchManager.disableLongpress();
             return this;
@@ -1762,6 +1778,8 @@ public class PDFView extends RelativeLayout {
             PDFView.this.setPageSnap(pageSnap);
             PDFView.this.setPageFling(pageFling);
             PDFView.this.setColorFilter(colorFilter);
+            //PDFView.this.setPlaceHoldColor(placeHoldColor);
+
 
             if (pageNumbers != null) {
                 PDFView.this.load(documentSource, password, pageNumbers);
