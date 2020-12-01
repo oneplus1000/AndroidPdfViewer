@@ -140,6 +140,7 @@ class PagesLoader {
             range.page = page;
 
             float pageFirstXOffset, pageFirstYOffset, pageLastXOffset, pageLastYOffset;
+            /*
             if (page == firstPage) {
                 pageFirstXOffset = fixedFirstXOffset;
                 pageFirstYOffset = fixedFirstYOffset;
@@ -171,23 +172,24 @@ class PagesLoader {
                 pageLastXOffset = fixedLastXOffset;
                 pageLastYOffset = fixedLastYOffset;
 
+            } else {*/
+            float pageOffset = pdfView.pdfFile.getPageOffset(page, pdfView.getZoom());
+            SizeF pageSize = pdfView.pdfFile.getScaledPageSize(page, pdfView.getZoom());
+            if (pdfView.isSwipeVertical()) {
+                pageFirstXOffset = fixedFirstXOffset;
+                pageFirstYOffset = pageOffset;
+
+                pageLastXOffset = fixedLastXOffset;
+                pageLastYOffset = pageOffset + pageSize.getHeight();
             } else {
-                float pageOffset = pdfView.pdfFile.getPageOffset(page, pdfView.getZoom());
-                SizeF pageSize = pdfView.pdfFile.getScaledPageSize(page, pdfView.getZoom());
-                if (pdfView.isSwipeVertical()) {
-                    pageFirstXOffset = fixedFirstXOffset;
-                    pageFirstYOffset = pageOffset;
+                pageFirstXOffset = pageOffset;
+                pageFirstYOffset = fixedFirstYOffset;
 
-                    pageLastXOffset = fixedLastXOffset;
-                    pageLastYOffset = pageOffset + pageSize.getHeight();
-                } else {
-                    pageFirstXOffset = pageOffset;
-                    pageFirstYOffset = fixedFirstYOffset;
-
-                    pageLastXOffset = pageOffset + pageSize.getWidth();
-                    pageLastYOffset = fixedLastYOffset;
-                }
+                pageLastXOffset = pageOffset + pageSize.getWidth();
+                pageLastYOffset = fixedLastYOffset;
             }
+            //}
+
 
             getPageColsRows(range.gridSize, range.page); // get the page's grid size that rows and cols
             SizeF scaledPageSize = pdfView.pdfFile.getScaledPageSize(range.page, pdfView.getZoom());
@@ -220,8 +222,22 @@ class PagesLoader {
                 range.rightBottom.row = MathUtils.floor(MathUtils.min(pageLastYOffset - secondaryOffset, 0) / rowHeight);
             }
 
+
+            if (page == 2) {
+                float w = pdfView.getWidth();
+                SizeF cw = pdfView.getPageSize(page);
+                float d0 = pdfView.pdfFile.getPageOffset(0, pdfView.getZoom());
+                //Log.d("XX","d0 = "+d0+" w="+w+"  cw.width="+cw.getWidth()+" pageFirstXOffset = "+pageFirstXOffset+ " pageLastXOffset = "  +pageLastXOffset+ "  firstXOffset=" +firstXOffset+ " range.leftTop.col="+range.leftTop.col +" range.rightBottom.col="+range.rightBottom.col);
+
+            }
+            Log.d("XX", "page=" + page + " pageFirstXOffset= " + pageFirstXOffset + "  colWidth=" + colWidth + "  pageLastXOffset= " + pageLastXOffset + " getPageOffset=" + pdfView.pdfFile.getPageOffset(range.page, pdfView.getZoom()) + "  col start=" + range.leftTop.col + "  last=" + range.rightBottom.col + " ");
+            //if(range.page == 0){
+            //    Log.d("XX"," pageFirstXOffset="+pageFirstXOffset + "  range.leftTop.col="+ range.leftTop.col + "   range.rightBottom.col="+  range.rightBottom.col);
+            //}
+
             renderRanges.add(range);
         }
+
 
         return renderRanges;
     }
@@ -244,6 +260,7 @@ class PagesLoader {
             calculatePartSize(range.gridSize);
             parts += loadPage(range.page, range.leftTop.row, range.rightBottom.row, range.leftTop.col, range.rightBottom.col, CACHE_SIZE - parts);
             if (parts >= CACHE_SIZE) {
+                //Log.d("XX","parts >= CACHE_SIZE ...." + range.page);
                 break;
             }
         }
@@ -252,10 +269,14 @@ class PagesLoader {
 
     private int loadPage(int page, int firstRow, int lastRow, int firstCol, int lastCol,
                          int nbOfPartsLoadable) {
+        //if(page == 0) {
+        //     Log.d("XX", "int page:" + page + ", firstRow:" + firstRow + " lastRow:" + lastRow + "  , firstCol:" + firstCol + " lastCol:" + lastCol + " ");
+        //}
         int loaded = 0;
         for (int row = firstRow; row <= lastRow; row++) {
-            //Log.d("RenderingHandler","int page:"+page+", int row:"+row+"");
+            //
             for (int col = firstCol; col <= lastCol; col++) {
+                //Log.d("XX","\tint page:"+page+"  row:"+row+"  col="+col+" ");
                 if (loadCell(page, row, col, pageRelativePartWidth, pageRelativePartHeight)) {
                     loaded++;
                 }
@@ -264,6 +285,7 @@ class PagesLoader {
                 }
             }
         }
+
         return loaded;
     }
 
@@ -307,13 +329,12 @@ class PagesLoader {
         float thumbnailHeight = pageSize.getHeight() * Constants.THUMBNAIL_RATIO;
         if (!pdfView.cacheManager.containsThumbnail(page, thumbnailRect)) {
 
-            pdfView.renderingHandler.addRenderingTaskForPlaceHolder(page,thumbnailWidth, thumbnailHeight, thumbnailRect);
+            pdfView.renderingHandler.addRenderingTaskForPlaceHolder(page, thumbnailWidth, thumbnailHeight, thumbnailRect);
             pdfView.renderingHandler.addRenderingTask(page,
                     thumbnailWidth, thumbnailHeight, thumbnailRect,
                     true, 0, pdfView.isBestQuality(), pdfView.isAnnotationRendering());
         }
     }
-
 
 
     void loadPages() {

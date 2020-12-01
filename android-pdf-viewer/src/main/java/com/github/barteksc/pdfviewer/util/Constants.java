@@ -17,7 +17,7 @@ package com.github.barteksc.pdfviewer.util;
 
 public class Constants {
 
-    public static boolean DEBUG_MODE = false;
+    public static boolean DEBUG_MODE = true;
 
     /** Between 0 and 1, the thumbnails quality (default 0.3). Increasing this value may cause performance decrease */
     public static float THUMBNAIL_RATIO = 0.3f;

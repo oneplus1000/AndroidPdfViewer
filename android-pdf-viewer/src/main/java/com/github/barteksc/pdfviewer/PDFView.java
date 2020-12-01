@@ -296,8 +296,9 @@ public class PDFView extends RelativeLayout {
 
     /**
      * placeHoldColor is color when pdf loading
-     * */
+     */
     private int placeHoldColor = Color.WHITE;
+
     /**
      * Construct the initial view
      */
@@ -307,7 +308,7 @@ public class PDFView extends RelativeLayout {
         initPDFView(context);
     }
 
-    public void setPlaceHoldColor(int color){
+    public void setPlaceHoldColor(int color) {
         this.placeHoldColor = color;
     }
 
@@ -335,7 +336,7 @@ public class PDFView extends RelativeLayout {
         debugPaint = new Paint();
         debugPaint.setStyle(Style.STROKE);
 
-        placeHoldPaint= new Paint();
+        placeHoldPaint = new Paint();
         placeHoldPaint.setStyle(Style.FILL);
         placeHoldPaint.setColor(this.placeHoldColor); //set สีของที่โล่งด้นหลัง เวลายังโหลดไม่เสร็จ
         //placeHoldPaint.setColor(Color.GREEN);
@@ -481,7 +482,7 @@ public class PDFView extends RelativeLayout {
         }
     }
 
-    public void setColorFilter(ColorFilter colorFilter){
+    public void setColorFilter(ColorFilter colorFilter) {
         paint.setColorFilter(colorFilter);
     }
 
@@ -722,13 +723,18 @@ public class PDFView extends RelativeLayout {
         }
 
         // Draws thumbnails
+        //int j = 0;
         for (PagePart part : cacheManager.getThumbnails()) {
             drawPart(canvas, part);
+            //j++;
         }
 
         // Draws parts
+        //Log.d("XX", "---------");
+        //int i = 0;
         for (PagePart part : cacheManager.getPageParts()) {
             drawPart(canvas, part);
+            //i++;
             if (callbacks.getOnDrawAll() != null
                     && !onDrawPagesNums.contains(part.getPage())) {
                 onDrawPagesNums.add(part.getPage());
@@ -811,9 +817,9 @@ public class PDFView extends RelativeLayout {
         // a possible gap between page parts, especially when
         // the zoom level is high.
         int gap = 4;
-        RectF dstRect = new RectF((int) offsetX+gap, (int) offsetY+gap,
-                (int) (offsetX + width-gap),
-                (int) (offsetY + height-gap));
+        RectF dstRect = new RectF((int) offsetX + gap, (int) offsetY + gap,
+                (int) (offsetX + width - gap),
+                (int) (offsetY + height - gap));
 
         // Check if bitmap is in the screen
         float translationX = currentXOffset + localTranslationX;
@@ -840,7 +846,7 @@ public class PDFView extends RelativeLayout {
     /**
      * Draw a given PagePart on the canvas
      */
-    private void drawPart(Canvas canvas, PagePart part) {
+    private void drawPart(Canvas canvas, PagePart part/*, String debug*/) {
         // Can seem strange, but avoid lot of calls
         RectF pageRelativeBounds = part.getPageRelativeBounds();
         Bitmap renderedBitmap = part.getRenderedBitmap();
@@ -863,7 +869,9 @@ public class PDFView extends RelativeLayout {
             float maxHeight = pdfFile.getMaxPageHeight(currentPageJumpTo);
             localTranslationY = toCurrentScale(maxHeight - size.getHeight()) / 2;
         }
-        //Log.d("YYY","localTranslationY ="+localTranslationY);
+        //if (part.getPage() == 0) {
+        //    Log.d("XX", "debug = " + debug + " part.getPage() =" + part.getPage());
+        //}
         //localTranslationY = 889;
         //canvas.translate(localTranslationX, localTranslationY);
         canvas.translate(localTranslationX, localTranslationY);
@@ -1724,7 +1732,7 @@ public class PDFView extends RelativeLayout {
             return this;
         }
 
-        public Configurator setColorFilter(ColorFilter colorFilter){
+        public Configurator setColorFilter(ColorFilter colorFilter) {
             this.colorFilter = colorFilter;
             return this;
         }
