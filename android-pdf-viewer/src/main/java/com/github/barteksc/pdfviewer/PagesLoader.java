@@ -214,7 +214,6 @@ class PagesLoader {
                 range.rightBottom.row = MathUtils.ceil(Math.abs(pageLastYOffset - pdfView.pdfFile.getPageOffset(range.page, pdfView.getZoom())) / rowHeight);
                 range.rightBottom.col = MathUtils.floor(MathUtils.min(pageLastXOffset - secondaryOffset, 0) / colWidth);
             } else {
-
                 range.leftTop.col = MathUtils.floor(Math.abs(pageFirstXOffset - pdfView.pdfFile.getPageOffset(range.page, pdfView.getZoom())) / colWidth);
                 range.leftTop.row = MathUtils.floor(MathUtils.min(pageFirstYOffset - Math.abs(secondaryOffset), 0) / rowHeight);
                 //Log.d("XXX","aaaaaa:"+range.leftTop.row  +" pageFirstYOffset:"+pageFirstYOffset  + " secondaryOffset:" + secondaryOffset + "result:"+MathUtils.min(pageFirstYOffset - secondaryOffset, 0));
@@ -223,21 +222,13 @@ class PagesLoader {
             }
 
 
-            if (page == 2) {
-                float w = pdfView.getWidth();
-                SizeF cw = pdfView.getPageSize(page);
-                float d0 = pdfView.pdfFile.getPageOffset(0, pdfView.getZoom());
-                //Log.d("XX","d0 = "+d0+" w="+w+"  cw.width="+cw.getWidth()+" pageFirstXOffset = "+pageFirstXOffset+ " pageLastXOffset = "  +pageLastXOffset+ "  firstXOffset=" +firstXOffset+ " range.leftTop.col="+range.leftTop.col +" range.rightBottom.col="+range.rightBottom.col);
-
-            }
-            Log.d("XX", "page=" + page + " pageFirstXOffset= " + pageFirstXOffset + "  colWidth=" + colWidth + "  pageLastXOffset= " + pageLastXOffset + " getPageOffset=" + pdfView.pdfFile.getPageOffset(range.page, pdfView.getZoom()) + "  col start=" + range.leftTop.col + "  last=" + range.rightBottom.col + " ");
+            //Log.d("XX", "page=" + page + " pageFirstXOffset= " + pageFirstXOffset + "  col start=" + range.leftTop.col + "  last=" + range.rightBottom.col + "   row start=" + range.leftTop.row + "  end=" + range.rightBottom.row);
             //if(range.page == 0){
             //    Log.d("XX"," pageFirstXOffset="+pageFirstXOffset + "  range.leftTop.col="+ range.leftTop.col + "   range.rightBottom.col="+  range.rightBottom.col);
             //}
 
             renderRanges.add(range);
         }
-
 
         return renderRanges;
     }
@@ -260,18 +251,14 @@ class PagesLoader {
             calculatePartSize(range.gridSize);
             parts += loadPage(range.page, range.leftTop.row, range.rightBottom.row, range.leftTop.col, range.rightBottom.col, CACHE_SIZE - parts);
             if (parts >= CACHE_SIZE) {
-                //Log.d("XX","parts >= CACHE_SIZE ...." + range.page);
+                Log.d("XX","parts >= CACHE_SIZE ...." + range.page);
                 break;
             }
         }
 
     }
 
-    private int loadPage(int page, int firstRow, int lastRow, int firstCol, int lastCol,
-                         int nbOfPartsLoadable) {
-        //if(page == 0) {
-        //     Log.d("XX", "int page:" + page + ", firstRow:" + firstRow + " lastRow:" + lastRow + "  , firstCol:" + firstCol + " lastCol:" + lastCol + " ");
-        //}
+    private int loadPage(int page, int firstRow, int lastRow, int firstCol, int lastCol, int nbOfPartsLoadable) {
         int loaded = 0;
         for (int row = firstRow; row <= lastRow; row++) {
             //
