@@ -210,22 +210,15 @@ class PagesLoader {
             if (pdfView.isSwipeVertical()) {
                 range.leftTop.row = MathUtils.floor(Math.abs(pageFirstYOffset - pdfView.pdfFile.getPageOffset(range.page, pdfView.getZoom())) / rowHeight);
                 range.leftTop.col = MathUtils.floor(MathUtils.min(pageFirstXOffset - secondaryOffset, 0) / colWidth);
-
                 range.rightBottom.row = MathUtils.ceil(Math.abs(pageLastYOffset - pdfView.pdfFile.getPageOffset(range.page, pdfView.getZoom())) / rowHeight);
                 range.rightBottom.col = MathUtils.floor(MathUtils.min(pageLastXOffset - secondaryOffset, 0) / colWidth);
             } else {
                 range.leftTop.col = MathUtils.floor(Math.abs(pageFirstXOffset - pdfView.pdfFile.getPageOffset(range.page, pdfView.getZoom())) / colWidth);
                 range.leftTop.row = MathUtils.floor(MathUtils.min(pageFirstYOffset - Math.abs(secondaryOffset), 0) / rowHeight);
-                //Log.d("XXX","aaaaaa:"+range.leftTop.row  +" pageFirstYOffset:"+pageFirstYOffset  + " secondaryOffset:" + secondaryOffset + "result:"+MathUtils.min(pageFirstYOffset - secondaryOffset, 0));
                 range.rightBottom.col = MathUtils.floor(Math.abs(pageLastXOffset - pdfView.pdfFile.getPageOffset(range.page, pdfView.getZoom())) / colWidth);
                 range.rightBottom.row = MathUtils.floor(MathUtils.min(pageLastYOffset - secondaryOffset, 0) / rowHeight);
             }
 
-
-            //Log.d("XX", "page=" + page + " pageFirstXOffset= " + pageFirstXOffset + "  col start=" + range.leftTop.col + "  last=" + range.rightBottom.col + "   row start=" + range.leftTop.row + "  end=" + range.rightBottom.row);
-            //if(range.page == 0){
-            //    Log.d("XX"," pageFirstXOffset="+pageFirstXOffset + "  range.leftTop.col="+ range.leftTop.col + "   range.rightBottom.col="+  range.rightBottom.col);
-            //}
 
             renderRanges.add(range);
         }
