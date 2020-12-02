@@ -54,9 +54,10 @@ class RenderingHandler extends Handler {
     }
 
     void addRenderingTask(int page, float width, float height, RectF bounds, boolean thumbnail, int cacheOrder, boolean bestQuality, boolean annotationRendering) {
-        //Log.d(TAG,"addRenderingTask-----------------------------"+page + " w:" +width +  " h:"+  height + " thumbnail:"+thumbnail);
+
         RenderingTask task = new RenderingTask(width, height, bounds, page, thumbnail, cacheOrder, bestQuality, annotationRendering);
         Message msg = obtainMessage(MSG_RENDER_TASK, task);
+        Log.d("XX","addRenderingTask-----------------------------"+page + " w:" +width +  " h:"+  height + " thumbnail:"+thumbnail);
         sendMessage(msg);
     }
 
@@ -84,7 +85,7 @@ class RenderingHandler extends Handler {
     public void handleMessage(Message message) {
 
         RenderingTask task = (RenderingTask) message.obj;
-        //Log.d("xx", "\thandleMessage" + task.page);
+        Log.d("XX", "\thandleMessage");
         try {
             final PagePart part = proceed(task);
             if (part != null) {

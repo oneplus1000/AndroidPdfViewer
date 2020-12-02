@@ -16,6 +16,7 @@
 package com.github.barteksc.pdfviewer;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.github.barteksc.pdfviewer.source.DocumentSource;
 import com.shockwave.pdfium.PdfDocument;

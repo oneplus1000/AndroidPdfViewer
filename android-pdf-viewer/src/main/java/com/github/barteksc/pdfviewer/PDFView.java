@@ -405,14 +405,15 @@ public class PDFView extends RelativeLayout {
         pageNb = pdfFile.determineValidPageNumberFrom(pageNb);
         currentPage = pageNb;
         currentPageJumpTo = pageNb;
-
+        Log.d("XX","showPage1");
         loadPages();
-
+        Log.d("XX","showPage2");
         if (scrollHandle != null && !documentFitsView()) {
             scrollHandle.setPageNum(currentPage + 1);
         }
-
+        Log.d("XX","showPage3");
         callbacks.callOnPageChange(currentPage, pdfFile.getPagesCount());
+        Log.d("XX","showPage4");
     }
 
     /**
@@ -662,6 +663,11 @@ public class PDFView extends RelativeLayout {
         if (isInEditMode()) {
             return;
         }
+
+        //long time01 = System.nanoTime();
+
+        Log.d("XX","------------");
+
         // As I said in this class javadoc, we can think of this canvas as a huge
         // strip on which we draw all the images. We actually only draw the rendered
         // parts, of course, but we render them in the place they belong in this huge
@@ -697,12 +703,15 @@ public class PDFView extends RelativeLayout {
             canvas.setDrawFilter(antialiasFilter);
         }
 
+
         Drawable bg = getBackground();
         if (bg == null) {
             canvas.drawColor(nightMode ? Color.BLACK : Color.WHITE);
         } else {
             bg.draw(canvas);
         }
+
+
 
         if (recycled) {
             return;
@@ -718,21 +727,33 @@ public class PDFView extends RelativeLayout {
         //Log.d("YYY","currentYOffset:"+currentYOffset);
         canvas.translate(currentXOffset, currentYOffset);
 
+        //long  time02 = System.nanoTime();
+        //double difference0201 = (time02 - time01) / 1e6;
+        //Log.d("XX","difference0201 = "+ difference0201);
+
         for (PagePart part : cacheManager.getPlaceHolders()) {
             drawPartPlaceHolder(canvas, part);
         }
 
+        //long  time03 = System.nanoTime();
+        //double difference0302 = (time03 - time02) / 1e6;
+       // Log.d("XX","difference0302 = "+ difference0302);
+
         // Draws thumbnails
-        //int j = 0;
         for (PagePart part : cacheManager.getThumbnails()) {
+            //Log.d("XX","getPage = " + part.getPage() + "  " + part.toString());
             drawPart(canvas, part);
-            //j++;
         }
 
+
+        //long  time04 = System.nanoTime();
+        //double difference0403 = (time04 - time03) / 1e6;
+        //Log.d("XX","difference0403 = "+ difference0403);
         // Draws parts
         //Log.d("XX", "---------");
         //int i = 0;
         for (PagePart part : cacheManager.getPageParts()) {
+            //Log.d("XX","left:"+part.getPageRelativeBounds().left+"  top:" +part.getPageRelativeBounds().top);
             drawPart(canvas, part);
             //i++;
             if (callbacks.getOnDrawAll() != null
@@ -740,6 +761,10 @@ public class PDFView extends RelativeLayout {
                 onDrawPagesNums.add(part.getPage());
             }
         }
+
+        //long  time05 = System.nanoTime();
+        //double difference0504 = (time05 - time04) / 1e6;
+        //Log.d("XX","difference0504 = "+ difference0504);
 
         for (Integer page : onDrawPagesNums) {
             drawWithListener(canvas, page, callbacks.getOnDrawAll());
@@ -925,10 +950,8 @@ public class PDFView extends RelativeLayout {
         // Cancel all current tasks
         renderingHandler.removeMessages(RenderingHandler.MSG_RENDER_TASK);
         cacheManager.makeANewSet();
-
         pagesLoader.loadPages();
         redraw();
-
     }
 
     /**
@@ -953,7 +976,6 @@ public class PDFView extends RelativeLayout {
         dragPinchManager.enable();
 
         callbacks.callOnLoadComplete(pdfFile.getPagesCount());
-
         jumpTo(defaultPage, false);
     }
 
@@ -995,6 +1017,7 @@ public class PDFView extends RelativeLayout {
         } else {
             cacheManager.cachePart(part);
         }
+        //Log.d("XX","EEEEEE");
         redraw();
     }
 
