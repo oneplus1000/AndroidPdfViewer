@@ -72,6 +72,7 @@ class DecodingAsyncTask extends AsyncTask<Void, Void, Throwable> {
     @Override
     protected void onPostExecute(Throwable t) {
         PDFView pdfView = pdfViewReference.get();
+        Log.d("XX","-----------> onPostExecute");
         if (pdfView != null) {
             if (t != null) {
                 pdfView.loadError(t);

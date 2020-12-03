@@ -57,7 +57,7 @@ class RenderingHandler extends Handler {
 
         RenderingTask task = new RenderingTask(width, height, bounds, page, thumbnail, cacheOrder, bestQuality, annotationRendering);
         Message msg = obtainMessage(MSG_RENDER_TASK, task);
-        Log.d("XX","addRenderingTask-----------------------------"+page + " w:" +width +  " h:"+  height + " thumbnail:"+thumbnail);
+        Log.d("XX", "sendMessage page:" + page + " left:" + bounds.left + " right:" + bounds.right + " thumbnail:" + thumbnail);
         sendMessage(msg);
     }
 
@@ -83,11 +83,16 @@ class RenderingHandler extends Handler {
 
     @Override
     public void handleMessage(Message message) {
-
+        //Log.d("XX", "\thandleMessage");
         RenderingTask task = (RenderingTask) message.obj;
-        Log.d("XX", "\thandleMessage");
+        Log.d("XX", "\t\t handleMessage  page:" + task.page + " left:" + task.bounds.left + " right:" + task.bounds.right +  " task.width:  " +  task.width + " thumbnail:" + task.thumbnail + " bestQuality:"+task.bestQuality);
+
         try {
-            final PagePart part = proceed(task);
+            long time01 = System.nanoTime();
+            final PagePart part = proceed(task); อยู่ตรงนี้นะปัญหา
+            long time02 = System.nanoTime();
+            double difference = (time02 - time01) / 1e6;
+            Log.d("XX", "\t\t END handleMessage  page:" + task.page + " left:" + task.bounds.left + " right:" + task.bounds.right + " thumbnail:" + task.thumbnail + "  difference:" + difference);
             if (part != null) {
                 if (running) {
                     pdfView.post(new Runnable() {
@@ -108,6 +113,10 @@ class RenderingHandler extends Handler {
                 }
             });
         }
+
+        // Log.d("XX","difference0302 = "+ difference0302);
+
+
     }
 
     private PagePart proceedPlaceHolder(RenderingTask renderingTask) throws PageRenderingException {

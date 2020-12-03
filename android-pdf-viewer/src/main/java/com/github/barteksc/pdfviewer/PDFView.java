@@ -405,15 +405,13 @@ public class PDFView extends RelativeLayout {
         pageNb = pdfFile.determineValidPageNumberFrom(pageNb);
         currentPage = pageNb;
         currentPageJumpTo = pageNb;
-        Log.d("XX","showPage1");
+
         loadPages();
-        Log.d("XX","showPage2");
         if (scrollHandle != null && !documentFitsView()) {
             scrollHandle.setPageNum(currentPage + 1);
         }
-        Log.d("XX","showPage3");
         callbacks.callOnPageChange(currentPage, pdfFile.getPagesCount());
-        Log.d("XX","showPage4");
+        Log.d("XX","showPage----");
     }
 
     /**
@@ -658,6 +656,8 @@ public class PDFView extends RelativeLayout {
         return false;
     }
 
+    int debugX = 0;
+
     @Override
     protected void onDraw(Canvas canvas) {
         if (isInEditMode()) {
@@ -666,7 +666,7 @@ public class PDFView extends RelativeLayout {
 
         //long time01 = System.nanoTime();
 
-        Log.d("XX","------------");
+
 
         // As I said in this class javadoc, we can think of this canvas as a huge
         // strip on which we draw all the images. We actually only draw the rendered
@@ -721,6 +721,8 @@ public class PDFView extends RelativeLayout {
             return;
         }
 
+        Log.d("XX","START onDraw------------"+debugX);
+
         // Moves the canvas before drawing any element
         float currentXOffset = this.currentXOffset;
         float currentYOffset = this.currentYOffset;
@@ -756,6 +758,7 @@ public class PDFView extends RelativeLayout {
             //Log.d("XX","left:"+part.getPageRelativeBounds().left+"  top:" +part.getPageRelativeBounds().top);
             drawPart(canvas, part);
             //i++;
+
             if (callbacks.getOnDrawAll() != null
                     && !onDrawPagesNums.contains(part.getPage())) {
                 onDrawPagesNums.add(part.getPage());
@@ -775,6 +778,9 @@ public class PDFView extends RelativeLayout {
 
         // Restores the canvas position
         canvas.translate(-currentXOffset, -currentYOffset);
+
+        Log.d("XX","\tEND onDraw------------"+debugX);
+        debugX++;
     }
 
     private void drawWithListener(Canvas canvas, int page, OnDrawListener listener) {
