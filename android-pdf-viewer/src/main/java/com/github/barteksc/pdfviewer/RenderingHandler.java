@@ -71,7 +71,6 @@ class RenderingHandler extends Handler {
                     pdfView.onBitmapRendered(part);
                 }
             });
-
         } catch (PageRenderingException e) {
             e.printStackTrace();
         }
@@ -84,9 +83,16 @@ class RenderingHandler extends Handler {
     public void handleMessage(Message message) {
 
         RenderingTask task = (RenderingTask) message.obj;
-        //Log.d("xx", "\thandleMessage" + task.page);
+
+
         try {
+            long time01 = System.nanoTime();
             final PagePart part = proceed(task);
+            long time02 = System.nanoTime();
+            double difference = (time02 - time01) / 1e6;
+            Log.d("XX", "\t\t END handleMessage  page:" + task.page + " left:" + task.bounds.left + " right:" + task.bounds.right + " thumbnail:" + task.thumbnail + "  difference:" + difference);
+
+
             if (part != null) {
                 if (running) {
                     pdfView.post(new Runnable() {
@@ -130,7 +136,7 @@ class RenderingHandler extends Handler {
             Log.d(TAG, "error");
             return null;
         }
-
+        renderingTask.bestQuality = false;
         Bitmap render;
         try {
             render = Bitmap.createBitmap(w, h, renderingTask.bestQuality ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565);
