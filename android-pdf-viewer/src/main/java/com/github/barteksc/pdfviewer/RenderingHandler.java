@@ -74,9 +74,6 @@ class RenderingHandler extends Handler {
         } catch (PageRenderingException e) {
             e.printStackTrace();
         }
-        //Message msg = obtainMessage(MSG_RENDER_TASK, task);
-        //Log.d("xx","---- loadThumbnail"+page);
-        //sendMessage(msg);
     }
 
     @Override
@@ -90,7 +87,7 @@ class RenderingHandler extends Handler {
             final PagePart part = proceed(task);
             long time02 = System.nanoTime();
             double difference = (time02 - time01) / 1e6;
-            Log.d("XX", "\t\t END handleMessage  page:" + task.page + " left:" + task.bounds.left + " right:" + task.bounds.right + " thumbnail:" + task.thumbnail + "  difference:" + difference);
+            //Log.d("XX", "\t\t END handleMessage  page:" + task.page + " left:" + task.bounds.left + " right:" + task.bounds.right + " thumbnail:" + task.thumbnail + "  difference:" + difference);
 
 
             if (part != null) {
@@ -136,7 +133,7 @@ class RenderingHandler extends Handler {
             Log.d(TAG, "error");
             return null;
         }
-        renderingTask.bestQuality = false;
+        //renderingTask.bestQuality = false;
         Bitmap render;
         try {
             render = Bitmap.createBitmap(w, h, renderingTask.bestQuality ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565);

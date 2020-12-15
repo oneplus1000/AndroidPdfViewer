@@ -244,7 +244,7 @@ class PagesLoader {
             calculatePartSize(range.gridSize);
             parts += loadPage(range.page, range.leftTop.row, range.rightBottom.row, range.leftTop.col, range.rightBottom.col, CACHE_SIZE - parts);
             if (parts >= CACHE_SIZE) {
-                Log.d("XX","parts >= CACHE_SIZE ...." + range.page);
+                Log.d("XX", "parts >= CACHE_SIZE ...." + range.page);
                 break;
             }
         }
@@ -296,7 +296,6 @@ class PagesLoader {
                         pageRelativeBounds, false, cacheOrder, pdfView.isBestQuality(),
                         pdfView.isAnnotationRendering());
             }
-
             cacheOrder++;
             return true;
         }
