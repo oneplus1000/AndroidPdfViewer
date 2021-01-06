@@ -83,10 +83,10 @@ class RenderingHandler extends Handler {
 
 
         try {
-            long time01 = System.nanoTime();
+            //long time01 = System.nanoTime();
             final PagePart part = proceed(task);
-            long time02 = System.nanoTime();
-            double difference = (time02 - time01) / 1e6;
+            //long time02 = System.nanoTime();
+            //double difference = (time02 - time01) / 1e6;
             //Log.d("XX", "\t\t END handleMessage  page:" + task.page + " left:" + task.bounds.left + " right:" + task.bounds.right + " thumbnail:" + task.thumbnail + "  difference:" + difference);
 
 

@@ -299,6 +299,18 @@ public class PDFView extends RelativeLayout {
      */
     private int placeHoldColor = Color.WHITE;
 
+
+    private boolean showDuoPageIfICan = false;
+
+    public boolean getShowDuoPageIfICan() {
+        return showDuoPageIfICan;
+    }
+
+    // โชวหน้าคู่ถ้าทำได้
+    public void showDuoPageIfICan(boolean showDuoPageIfICan){
+        this.showDuoPageIfICan = showDuoPageIfICan;
+    }
+
     /**
      * Construct the initial view
      */
@@ -864,10 +876,18 @@ public class PDFView extends RelativeLayout {
             localTranslationY = pdfFile.getPageOffset(part.getPage(), zoom);
             float maxWidth = pdfFile.getMaxPageWidth();
             localTranslationX = toCurrentScale(maxWidth - size.getWidth()) / 2;
+            //Log.d("XX","AAAAA");
         } else {
             localTranslationX = pdfFile.getPageOffset(part.getPage(), zoom);
+
+            //if(part.getPage() % 2 == 0){
+            //    SizeF pageSize = pdfFile.getPageSize(part.getPage()-1);
+            //    localTranslationX = pdfFile.getPageOffset(part.getPage()-1, zoom) + pageSize.getWidth();
+            //}
             float maxHeight = pdfFile.getMaxPageHeight(currentPageJumpTo);
             localTranslationY = toCurrentScale(maxHeight - size.getHeight()) / 2;
+           // Log.d("XX","page: "+part.getPage() + " "+localTranslationX);
+            //Log.d("XX","BBBB localTranslationX:"+localTranslationX +" localTranslationY:"+localTranslationY);
         }
         //if (part.getPage() == 0) {
         //    Log.d("XX", "debug = " + debug + " part.getPage() =" + part.getPage());
@@ -909,6 +929,7 @@ public class PDFView extends RelativeLayout {
 
         // Restore the canvas position
         canvas.translate(-localTranslationX, -localTranslationY);
+        Log.d("XX", "part.page: " + part.getPage() + " offsetX: " + offsetX + " offsetY: " + offsetY + " localTranslationX:" + localTranslationX);
 
     }
 
@@ -1589,12 +1610,21 @@ public class PDFView extends RelativeLayout {
 
         private ColorFilter colorFilter = null;
 
+        private boolean showDuoPageIfICan = false;
+
         //private int placeHoldColor = Color.WHITE;
 
         private OnPageZoomListener onPageZoomListener;
 
+
         private Configurator(DocumentSource documentSource) {
             this.documentSource = documentSource;
+        }
+
+        //โชว์แสดงหน้าคู่ถ้าทำได้
+        public Configurator showDuoPageIfICan(boolean showDuoPageIfICan) {
+            this.showDuoPageIfICan = showDuoPageIfICan;
+            return this;
         }
 
         public Configurator pages(int... pageNumbers) {
@@ -1773,6 +1803,7 @@ public class PDFView extends RelativeLayout {
             PDFView.this.callbacks.setOnPageZoom(onPageZoomListener);
             PDFView.this.setSwipeEnabled(enableSwipe);
             PDFView.this.setNightMode(nightMode);
+            PDFView.this.showDuoPageIfICan(showDuoPageIfICan);
             PDFView.this.enableDoubletap(enableDoubletap);
             PDFView.this.setDefaultPage(defaultPage);
             PDFView.this.setSwipeVertical(!swipeHorizontal);

@@ -76,8 +76,17 @@ class PdfFile {
      */
     private int[] originalUserPages;
 
-    PdfFile(PdfiumCore pdfiumCore, PdfDocument pdfDocument, FitPolicy pageFitPolicy, Size viewSize, int[] originalUserPages,
-            boolean isVertical, int spacing, boolean autoSpacing, boolean fitEachPage) {
+   private boolean showDuoPageIfICan = false;
+
+
+    PdfFile(PdfiumCore pdfiumCore, PdfDocument pdfDocument,
+            FitPolicy pageFitPolicy, Size viewSize,
+            int[] originalUserPages,
+            boolean isVertical, int spacing,
+            boolean autoSpacing,
+            boolean fitEachPage,
+            boolean showDuoPageIfICan
+            ) {
         this.pdfiumCore = pdfiumCore;
         this.pdfDocument = pdfDocument;
         this.pageFitPolicy = pageFitPolicy;
@@ -86,6 +95,7 @@ class PdfFile {
         this.spacingPx = spacing;
         this.autoSpacing = autoSpacing;
         this.fitEachPage = fitEachPage;
+        this.showDuoPageIfICan = showDuoPageIfICan;
         setup(viewSize);
     }
 
@@ -220,8 +230,31 @@ class PdfFile {
                 pageOffsets.add(offset);
                 offset += size + spacingPx;
             }
+            Log.d("XX","page: "+i+ "   "+offset);
         }
     }
+    /*
+    private void preparePagesOffset() {
+        pageOffsets.clear();
+        float offset = 0;
+        for (int i = 0; i < getPagesCount(); i++) {
+            SizeF pageSize = pageSizes.get(i);
+            float size = isVertical ? pageSize.getHeight() : pageSize.getWidth();
+            if (autoSpacing) {
+                offset += pageSpacing.get(i) / 2f;
+                if (i == 0) {
+                    offset -= spacingPx / 2f;
+                } else if (i == getPagesCount() - 1) {
+                    offset += spacingPx / 2f;
+                }
+                pageOffsets.add(offset);
+                offset += size + pageSpacing.get(i) / 2f;
+            } else {
+                pageOffsets.add(offset);
+                offset += size + spacingPx;
+            }
+        }
+    }*/
 
     public float getDocLen(float zoom) {
         return documentLength * zoom;
