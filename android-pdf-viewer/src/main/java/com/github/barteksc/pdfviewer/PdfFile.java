@@ -38,31 +38,57 @@ class PdfFile {
     private PdfDocument pdfDocument;
     private PdfiumCore pdfiumCore;
     private int pagesCount = 0;
-    /** Original page sizes */
+    /**
+     * Original page sizes
+     */
     private List<Size> originalPageSizes = new ArrayList<>();
-    /** Scaled page sizes */
-    private List<SizeF> pageSizes = new ArrayList<>();
-    /** Opened pages with indicator whether opening was successful */
+    /**
+     * Scaled page sizes
+     */
+    //private List<SizeF> pageSizes = new ArrayList<>();
+    /**
+     * Opened pages with indicator whether opening was successful
+     */
     private SparseBooleanArray openedPages = new SparseBooleanArray();
-    /** Page with maximum width */
+    /**
+     * Page with maximum width
+     */
     private Size originalMaxWidthPageSize = new Size(0, 0);
-    /** Page with maximum height */
+    /**
+     * Page with maximum height
+     */
     private Size originalMaxHeightPageSize = new Size(0, 0);
-    /** Scaled page with maximum height */
+    /**
+     * Scaled page with maximum height
+     */
     private SizeF maxHeightPageSize = new SizeF(0, 0);
-    /** Scaled page with maximum width */
+    /**
+     * Scaled page with maximum width
+     */
     private SizeF maxWidthPageSize = new SizeF(0, 0);
-    /** True if scrolling is vertical, else it's horizontal */
+    /**
+     * True if scrolling is vertical, else it's horizontal
+     */
     private boolean isVertical;
-    /** Fixed spacing between pages in pixels */
+    /**
+     * Fixed spacing between pages in pixels
+     */
     private int spacingPx;
-    /** Calculate spacing automatically so each page fits on it's own in the center of the view */
+    /**
+     * Calculate spacing automatically so each page fits on it's own in the center of the view
+     */
     private boolean autoSpacing;
-    /** Calculated offsets for pages */
-    private List<Float> pageOffsets = new ArrayList<>();
-    /** Calculated auto spacing for pages */
-    private List<Float> pageSpacing = new ArrayList<>();
-    /** Calculated document length (width or height, depending on swipe mode) */
+    /**
+     * Calculated offsets for pages
+     */
+    //private List<Float> pageOffsets = new ArrayList<>();
+    /**
+     * Calculated auto spacing for pages
+     */
+    //private List<Float> pageSpacing = new ArrayList<>();
+    /**
+     * Calculated document length (width or height, depending on swipe mode)
+     */
     private float documentLength = 0;
     private final FitPolicy pageFitPolicy;
     /**
@@ -76,7 +102,13 @@ class PdfFile {
      */
     private int[] originalUserPages;
 
-   private boolean showDuoPageIfICan = false;
+    private boolean showDuoPageIfICan = false; //พยามแสดงผลแบบหน้าคู่
+
+    final public static int DISPLAY_PAGE_TYPE_SINGLE_PAGE = 1;
+    final public static int DISPLAY_PAGE_TYPE_DUO_PAGE = 2;
+    private int displayPageType = DISPLAY_PAGE_TYPE_SINGLE_PAGE; //แสดงผลหน้าแบบใด?
+
+    private DisplayPageInfos displaypages = new DisplayPageInfos();
 
 
     PdfFile(PdfiumCore pdfiumCore, PdfDocument pdfDocument,
@@ -86,7 +118,7 @@ class PdfFile {
             boolean autoSpacing,
             boolean fitEachPage,
             boolean showDuoPageIfICan
-            ) {
+    ) {
         this.pdfiumCore = pdfiumCore;
         this.pdfDocument = pdfDocument;
         this.pageFitPolicy = pageFitPolicy;
@@ -97,6 +129,13 @@ class PdfFile {
         this.fitEachPage = fitEachPage;
         this.showDuoPageIfICan = showDuoPageIfICan;
         setup(viewSize);
+    }
+
+    //รูปแบบที่หน้าจอสามารถแสดงได้
+    //DISPLAY_PAGE_TYPE_SINGLE_PAGE = 1; หน้าเดียวๆ
+    //DISPLAY_PAGE_TYPE_DUO_PAGE = 2; หน้าคู่
+    public int getDisplayPageType() {
+        return this.displayPageType;
     }
 
     private void setup(Size viewSize) {
@@ -126,15 +165,45 @@ class PdfFile {
      * @param viewSize new size of changed view
      */
     public void recalculatePageSizes(Size viewSize) {
-        pageSizes.clear();
+        this.displaypages.clear();
+        this.preparePageIndexs();
+        //
         PageSizeCalculator calculator = new PageSizeCalculator(pageFitPolicy, originalMaxWidthPageSize,
-                originalMaxHeightPageSize, viewSize,  fitEachPage);
+                originalMaxHeightPageSize, viewSize, fitEachPage);
         maxWidthPageSize = calculator.getOptimalMaxWidthPageSize();
         maxHeightPageSize = calculator.getOptimalMaxHeightPageSize();
 
-        for (Size size : originalPageSizes) {
-            pageSizes.add(calculator.calculate(size));
+        boolean viewSizeFitForDuoPage = false;
+        if (!this.isVertical) {
+            viewSizeFitForDuoPage = true;
         }
+
+        List<SizeF> pageSizes = new ArrayList<>();
+        int index = 0;
+        for (Size size : originalPageSizes) {
+            SizeF s = calculator.calculate(size);
+            if (!this.isVertical) {
+                if (viewSize.getWidth() < s.getWidth() * 2) {
+                    viewSizeFitForDuoPage = false;
+                }
+            }
+            pageSizes.add(s);
+            this.displaypages.getByPage(index).pageSizes.put(index,s);
+            index++;
+        }
+
+
+
+        if (viewSizeFitForDuoPage) {
+            this.displayPageType = PdfFile.DISPLAY_PAGE_TYPE_DUO_PAGE;
+        } else {
+            this.displayPageType = PdfFile.DISPLAY_PAGE_TYPE_SINGLE_PAGE;
+        }
+
+        Log.d("XX", "this.displayPageType: " + this.displayPageType);
+
+
+
         if (autoSpacing) {
             prepareAutoSpacing(viewSize);
         }
@@ -146,12 +215,46 @@ class PdfFile {
         return pagesCount;
     }
 
+    private void preparePageIndexs() {
+        if (this.displayPageType == PdfFile.DISPLAY_PAGE_TYPE_DUO_PAGE) {
+            int count = getPagesCount();
+            int i = 0;
+            while (true) {
+                if (i >= count) {
+                    break;
+                }
+                List<Integer> pages = new ArrayList<>();
+                pages.add(i);
+                i++;
+                if (i >= count) {
+                    this.displaypages.addItem(pages);
+                    break;
+                }
+                pages.add(i);
+                this.displaypages.addItem(pages);
+                i++;
+            }
+        } else {
+            int count = getPagesCount();
+            for (int i = 0; i < count; i++) {
+                List<Integer> pages = new ArrayList<Integer>();
+                pages.add(i);
+                this.displaypages.addItem(pages);
+            }
+        }
+    }
+
     public SizeF getPageSize(int pageIndex) {
         int docPage = documentPage(pageIndex);
         if (docPage < 0) {
             return new SizeF(0, 0);
         }
-        return pageSizes.get(pageIndex);
+
+        DisplayPageInfos.PageFile p = this.displaypages.getByPage(pageIndex);
+        if(p == null){
+            return new SizeF(0, 0);
+        }
+        return p.pageSize;
     }
 
     public SizeF getScaledPageSize(int pageIndex, float zoom) {
@@ -178,23 +281,36 @@ class PdfFile {
         //Log.d("YYY","  index: "+index + "  getHeight: " + getPageSize(index).getHeight());
         //return getPageSize(index).getHeight();
         //return getMaxPageSize().getHeight();
-        if( getPageSize(index).getHeight() >  getMaxPageSize().getHeight()){
+        if (getPageSize(index).getHeight() > getMaxPageSize().getHeight()) {
             return getPageSize(index).getHeight();
         }
         return getMaxPageSize().getHeight();
     }
 
     private void prepareAutoSpacing(Size viewSize) {
+        //หาค่าไปยัดใส่ PageFile.pageSpacing
+        int count = this.displaypages.itemsSize();
+        for(int i = 0; i < count; i++){
+
+        }
+        /*
         pageSpacing.clear();
         for (int i = 0; i < getPagesCount(); i++) {
             SizeF pageSize = pageSizes.get(i);
+            // float spacing = 0.0f;
+            // if (this.displayPageType == PdfFile.DISPLAY_PAGE_TYPE_DUO_PAGE) {
+            //     spacing = Math.max(0, isVertical ? (viewSize.getHeight() / 2f) - pageSize.getHeight() :
+            //             (viewSize.getWidth() / 2f) - pageSize.getWidth());
+            // } else {
             float spacing = Math.max(0, isVertical ? viewSize.getHeight() - pageSize.getHeight() :
                     viewSize.getWidth() - pageSize.getWidth());
+            //}
+
             if (i < getPagesCount() - 1) {
                 spacing += spacingPx;
             }
             pageSpacing.add(spacing);
-        }
+        }*/
     }
 
     private void prepareDocLen() {
@@ -230,7 +346,7 @@ class PdfFile {
                 pageOffsets.add(offset);
                 offset += size + spacingPx;
             }
-            Log.d("XX","page: "+i+ "   "+offset);
+            Log.d("XX", "page: " + i + "   " + offset);
         }
     }
     /*
@@ -273,7 +389,9 @@ class PdfFile {
         return spacing * zoom;
     }
 
-    /** Get primary page offset, that is Y for vertical scroll and X for horizontal scroll */
+    /**
+     * Get primary page offset, that is Y for vertical scroll and X for horizontal scroll
+     */
     public float getPageOffset(int pageIndex, float zoom) {
         int docPage = documentPage(pageIndex);
         if (docPage < 0) {
@@ -282,7 +400,9 @@ class PdfFile {
         return pageOffsets.get(pageIndex) * zoom;
     }
 
-    /** Get secondary page offset, that is X for vertical scroll and Y for horizontal scroll */
+    /**
+     * Get secondary page offset, that is X for vertical scroll and Y for horizontal scroll
+     */
     public float getSecondaryPageOffset(int pageIndex, float zoom) {
         SizeF pageSize = getPageSize(pageIndex);
         if (isVertical) {
@@ -374,14 +494,14 @@ class PdfFile {
         originalUserPages = null;
     }
 
-    private void printDebug(String title){
+    private void printDebug(String title) {
         StackTraceElement[] eles = Thread.currentThread().getStackTrace();
-        if(eles == null){
+        if (eles == null) {
             return;
         }
-        Log.d("printDebug","-----------"+title+"------------");
-        for(StackTraceElement ele : eles){
-            Log.d("printDebug",ele.getMethodName());
+        Log.d("printDebug", "-----------" + title + "------------");
+        for (StackTraceElement ele : eles) {
+            Log.d("printDebug", ele.getMethodName());
         }
     }
 
@@ -426,3 +546,5 @@ class PdfFile {
         return documentPage;
     }
 }
+
+

@@ -22,6 +22,7 @@ public class PagePart {
 
     private int page;
 
+
     private Bitmap renderedBitmap;
 
     private RectF pageRelativeBounds;
