@@ -299,6 +299,7 @@ public class PDFView extends RelativeLayout {
      */
     private int placeHoldColor = Color.WHITE;
 
+    private int requestDisplayDualPageType = Configurator.REQUEST_DISPLAY_DUALPAGE_TYPE_ONLY_SINGLE_PAGE;
     /**
      * Construct the initial view
      */
@@ -312,6 +313,14 @@ public class PDFView extends RelativeLayout {
         this.placeHoldColor = color;
     }
 
+    public void setRequestDisplayDualPageType(int pageType){
+        this.requestDisplayDualPageType = pageType;
+    }
+
+    public int getRequestDisplayDualPageType() {
+        return this.requestDisplayDualPageType;
+    }
+    
     /**
      * Construct the initial view
      */
@@ -1799,6 +1808,7 @@ public class PDFView extends RelativeLayout {
             PDFView.this.setPageSnap(pageSnap);
             PDFView.this.setPageFling(pageFling);
             PDFView.this.setColorFilter(colorFilter);
+            PDFView.this.setRequestDisplayDualPageType(requestDisplayDualPageType);
             //PDFView.this.setPlaceHoldColor(placeHoldColor);
 
 

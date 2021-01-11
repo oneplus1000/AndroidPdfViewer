@@ -176,7 +176,7 @@ class PdfFile {
                 }
             }
         }
-        this.realDisplayDualPageType = realDisplayDualPage; //set value
+        this.realDisplayDualPageType = realDisplayDualPage;
 
         if (autoSpacing) {
             prepareAutoSpacing(viewSize);
