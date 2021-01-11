@@ -38,31 +38,57 @@ class PdfFile {
     private PdfDocument pdfDocument;
     private PdfiumCore pdfiumCore;
     private int pagesCount = 0;
-    /** Original page sizes */
+    /**
+     * Original page sizes
+     */
     private List<Size> originalPageSizes = new ArrayList<>();
-    /** Scaled page sizes */
+    /**
+     * Scaled page sizes
+     */
     private List<SizeF> pageSizes = new ArrayList<>();
-    /** Opened pages with indicator whether opening was successful */
+    /**
+     * Opened pages with indicator whether opening was successful
+     */
     private SparseBooleanArray openedPages = new SparseBooleanArray();
-    /** Page with maximum width */
+    /**
+     * Page with maximum width
+     */
     private Size originalMaxWidthPageSize = new Size(0, 0);
-    /** Page with maximum height */
+    /**
+     * Page with maximum height
+     */
     private Size originalMaxHeightPageSize = new Size(0, 0);
-    /** Scaled page with maximum height */
+    /**
+     * Scaled page with maximum height
+     */
     private SizeF maxHeightPageSize = new SizeF(0, 0);
-    /** Scaled page with maximum width */
+    /**
+     * Scaled page with maximum width
+     */
     private SizeF maxWidthPageSize = new SizeF(0, 0);
-    /** True if scrolling is vertical, else it's horizontal */
+    /**
+     * True if scrolling is vertical, else it's horizontal
+     */
     private boolean isVertical;
-    /** Fixed spacing between pages in pixels */
+    /**
+     * Fixed spacing between pages in pixels
+     */
     private int spacingPx;
-    /** Calculate spacing automatically so each page fits on it's own in the center of the view */
+    /**
+     * Calculate spacing automatically so each page fits on it's own in the center of the view
+     */
     private boolean autoSpacing;
-    /** Calculated offsets for pages */
+    /**
+     * Calculated offsets for pages
+     */
     private List<Float> pageOffsets = new ArrayList<>();
-    /** Calculated auto spacing for pages */
+    /**
+     * Calculated auto spacing for pages
+     */
     private List<Float> pageSpacing = new ArrayList<>();
-    /** Calculated document length (width or height, depending on swipe mode) */
+    /**
+     * Calculated document length (width or height, depending on swipe mode)
+     */
     private float documentLength = 0;
     private final FitPolicy pageFitPolicy;
     /**
@@ -76,8 +102,15 @@ class PdfFile {
      */
     private int[] originalUserPages;
 
+
+    //request อยากให้แสดงแบบไหน
+    private int requestDisplayDualPageType = PDFView.Configurator.REQUEST_DISPLAY_DUALPAGE_TYPE_ONLY_SINGLE_PAGE;
+    //แสดงผลจริง
+    private int realDisplayDualPageType = PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SINGLE_PAGE;
+
     PdfFile(PdfiumCore pdfiumCore, PdfDocument pdfDocument, FitPolicy pageFitPolicy, Size viewSize, int[] originalUserPages,
-            boolean isVertical, int spacing, boolean autoSpacing, boolean fitEachPage) {
+            boolean isVertical, int spacing, boolean autoSpacing, boolean fitEachPage,
+            int requestDisplayDualPageType) {
         this.pdfiumCore = pdfiumCore;
         this.pdfDocument = pdfDocument;
         this.pageFitPolicy = pageFitPolicy;
@@ -86,7 +119,12 @@ class PdfFile {
         this.spacingPx = spacing;
         this.autoSpacing = autoSpacing;
         this.fitEachPage = fitEachPage;
+        this.requestDisplayDualPageType = requestDisplayDualPageType;
         setup(viewSize);
+    }
+
+    public List<Float> getDisplayDualPageType() {
+        return pageOffsets;
     }
 
     private void setup(Size viewSize) {
@@ -118,13 +156,28 @@ class PdfFile {
     public void recalculatePageSizes(Size viewSize) {
         pageSizes.clear();
         PageSizeCalculator calculator = new PageSizeCalculator(pageFitPolicy, originalMaxWidthPageSize,
-                originalMaxHeightPageSize, viewSize,  fitEachPage);
+                originalMaxHeightPageSize, viewSize, fitEachPage);
         maxWidthPageSize = calculator.getOptimalMaxWidthPageSize();
         maxHeightPageSize = calculator.getOptimalMaxHeightPageSize();
 
-        for (Size size : originalPageSizes) {
-            pageSizes.add(calculator.calculate(size));
+        int viewSizeHalfWidth = viewSize.getWidth() / 2;
+        int realDisplayDualPage = PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SINGLE_PAGE;
+        boolean maybeCanDisplayDualPage = this.autoSpacing && !this.isVertical;
+        if(maybeCanDisplayDualPage){
+            realDisplayDualPage = PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE;
         }
+        for (Size size : originalPageSizes) {
+            SizeF pageSize = calculator.calculate(size);
+            pageSizes.add(pageSize);
+            //ตรวจสอบว่าหน้าจอพอดีกับการแสดงหน้าคู่หรือไม่??
+            if (this.autoSpacing && !this.isVertical) {
+                if (pageSize.getWidth() > viewSizeHalfWidth) { //ขนาดเกินแสดงไม่ได้
+                    realDisplayDualPage = PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SINGLE_PAGE;
+                }
+            }
+        }
+        this.realDisplayDualPageType = realDisplayDualPage; //set value
+
         if (autoSpacing) {
             prepareAutoSpacing(viewSize);
         }
@@ -168,7 +221,7 @@ class PdfFile {
         //Log.d("YYY","  index: "+index + "  getHeight: " + getPageSize(index).getHeight());
         //return getPageSize(index).getHeight();
         //return getMaxPageSize().getHeight();
-        if( getPageSize(index).getHeight() >  getMaxPageSize().getHeight()){
+        if (getPageSize(index).getHeight() > getMaxPageSize().getHeight()) {
             return getPageSize(index).getHeight();
         }
         return getMaxPageSize().getHeight();
@@ -240,7 +293,9 @@ class PdfFile {
         return spacing * zoom;
     }
 
-    /** Get primary page offset, that is Y for vertical scroll and X for horizontal scroll */
+    /**
+     * Get primary page offset, that is Y for vertical scroll and X for horizontal scroll
+     */
     public float getPageOffset(int pageIndex, float zoom) {
         int docPage = documentPage(pageIndex);
         if (docPage < 0) {
@@ -249,7 +304,9 @@ class PdfFile {
         return pageOffsets.get(pageIndex) * zoom;
     }
 
-    /** Get secondary page offset, that is X for vertical scroll and Y for horizontal scroll */
+    /**
+     * Get secondary page offset, that is X for vertical scroll and Y for horizontal scroll
+     */
     public float getSecondaryPageOffset(int pageIndex, float zoom) {
         SizeF pageSize = getPageSize(pageIndex);
         if (isVertical) {
@@ -341,14 +398,14 @@ class PdfFile {
         originalUserPages = null;
     }
 
-    private void printDebug(String title){
+    private void printDebug(String title) {
         StackTraceElement[] eles = Thread.currentThread().getStackTrace();
-        if(eles == null){
+        if (eles == null) {
             return;
         }
-        Log.d("printDebug","-----------"+title+"------------");
-        for(StackTraceElement ele : eles){
-            Log.d("printDebug",ele.getMethodName());
+        Log.d("printDebug", "-----------" + title + "------------");
+        for (StackTraceElement ele : eles) {
+            Log.d("printDebug", ele.getMethodName());
         }
     }
 

@@ -1593,6 +1593,13 @@ public class PDFView extends RelativeLayout {
 
         private OnPageZoomListener onPageZoomListener;
 
+        final public static int REQUEST_DISPLAY_DUALPAGE_TYPE_ONLY_SINGLE_PAGE = 0;
+        final public static int REQUEST_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE_IF_IT_CAN = 1; //โชว์ page คู่ถ้าเป็นไปได้
+
+        final public static int REAL_DISPLAY_DUALPAGE_TYPE_SINGLE_PAGE = 100;
+        final public static int REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE = 101;
+        private int requestDisplayDualPageType = REQUEST_DISPLAY_DUALPAGE_TYPE_ONLY_SINGLE_PAGE;
+
         private Configurator(DocumentSource documentSource) {
             this.documentSource = documentSource;
         }
@@ -1750,6 +1757,12 @@ public class PDFView extends RelativeLayout {
 
         public Configurator onPageZoom(OnPageZoomListener onPageZoomListener) {
             this.onPageZoomListener = onPageZoomListener;
+            return this;
+        }
+
+
+        public Configurator requestDisplayDualPage(int requestType) {
+            this.requestDisplayDualPageType = requestType;
             return this;
         }
 
