@@ -803,11 +803,11 @@ public class PDFView extends RelativeLayout {
             float maxWidth = pdfFile.getMaxPageWidth();
             localTranslationX = toCurrentScale(maxWidth - size.getWidth()) / 2;
         } else {
-            localTranslationX = pdfFile.getPageOffset(part.getPage(), zoom);
+            localTranslationX = pdfFile.getPageOffsetForLocalTranslationX(part.getPage(), zoom);
             float maxHeight = pdfFile.getMaxPageHeight(currentPageJumpTo);
             localTranslationY = toCurrentScale(maxHeight - size.getHeight()) / 2;
         }
-        //Log.d("YYY","localTranslationY ="+localTranslationY);
+        Log.d("XXX","localTranslationX ="+localTranslationX + "   "+part.getPage());
         //localTranslationY = 889;
         //canvas.translate(localTranslationX, localTranslationY);
         canvas.translate(localTranslationX, localTranslationY);
@@ -874,7 +874,7 @@ public class PDFView extends RelativeLayout {
             float maxWidth = pdfFile.getMaxPageWidth();
             localTranslationX = toCurrentScale(maxWidth - size.getWidth()) / 2;
         } else {
-            localTranslationX = pdfFile.getPageOffset(part.getPage(), zoom);
+            localTranslationX = pdfFile.getPageOffsetForLocalTranslationX(part.getPage(), zoom);
             float maxHeight = pdfFile.getMaxPageHeight(currentPageJumpTo);
             localTranslationY = toCurrentScale(maxHeight - size.getHeight()) / 2;
         }

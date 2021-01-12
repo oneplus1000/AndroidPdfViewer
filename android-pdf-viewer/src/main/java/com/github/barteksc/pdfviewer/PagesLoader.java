@@ -129,9 +129,19 @@ class PagesLoader {
         float offsetFirst = pdfView.isSwipeVertical() ? fixedFirstYOffset : fixedFirstXOffset;
         float offsetLast = pdfView.isSwipeVertical() ? fixedLastYOffset : fixedLastXOffset;
 
-        int firstPage = pdfView.pdfFile.getPageAtOffset(offsetFirst, pdfView.getZoom());
-        int lastPage = pdfView.pdfFile.getPageAtOffset(offsetLast, pdfView.getZoom());
-        int pageCount = lastPage - firstPage + 1;
+        int firstPage = 0; //pdfView.pdfFile.getPageAtOffset(offsetFirst, pdfView.getZoom());
+        int lastPage = 0;//pdfView.pdfFile.getPageAtOffset(offsetLast, pdfView.getZoom());
+        if (pdfView.pdfFile.getRealDisplayDualPageType() == PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
+            int[] pages = pdfView.pdfFile.getPageAtOffsetForDualPage(offsetFirst, offsetLast, pdfView.getZoom());
+            firstPage = pages[0];
+            lastPage = pages[1];
+        } else {
+            firstPage = pdfView.pdfFile.getPageAtOffset(offsetFirst, pdfView.getZoom());
+            lastPage = pdfView.pdfFile.getPageAtOffset(offsetLast, pdfView.getZoom());
+        }
+        //int pageCount = lastPage - firstPage + 1;
+        Log.d("XX", "firstPage :" + firstPage + " lastPage:" + lastPage + "  offsetFirst:" + offsetFirst + " offsetLast:" + offsetLast);
+
 
         List<RenderRange> renderRanges = new LinkedList<>();
 
@@ -236,9 +246,12 @@ class PagesLoader {
 
         List<RenderRange> rangeList = getRenderRangeList(firstXOffset, firstYOffset, lastXOffset, lastYOffset);
 
+        String debug = "rangeList: ";
         for (RenderRange range : rangeList) {
             loadThumbnail(range.page);
+            debug = debug + " " + range.page;
         }
+        Log.d("XX", debug);
 
         for (RenderRange range : rangeList) {
             calculatePartSize(range.gridSize);

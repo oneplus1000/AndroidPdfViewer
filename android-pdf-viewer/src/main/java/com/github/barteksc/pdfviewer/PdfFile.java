@@ -22,6 +22,7 @@ import android.util.Log;
 import android.util.SparseBooleanArray;
 
 import com.github.barteksc.pdfviewer.exception.PageRenderingException;
+import com.github.barteksc.pdfviewer.model.DualPageDisplay;
 import com.github.barteksc.pdfviewer.util.FitPolicy;
 import com.github.barteksc.pdfviewer.util.PageSizeCalculator;
 import com.shockwave.pdfium.PdfDocument;
@@ -108,6 +109,8 @@ class PdfFile {
     //แสดงผลจริง
     private int realDisplayDualPageType = PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SINGLE_PAGE;
 
+    private Size viewSize = null;
+
     PdfFile(PdfiumCore pdfiumCore, PdfDocument pdfDocument, FitPolicy pageFitPolicy, Size viewSize, int[] originalUserPages,
             boolean isVertical, int spacing, boolean autoSpacing, boolean fitEachPage,
             int requestDisplayDualPageType) {
@@ -123,11 +126,12 @@ class PdfFile {
         setup(viewSize);
     }
 
-    public List<Float> getDisplayDualPageType() {
-        return pageOffsets;
+    public int getRealDisplayDualPageType() {
+        return this.realDisplayDualPageType;
     }
 
     private void setup(Size viewSize) {
+
         if (originalUserPages != null) {
             pagesCount = originalUserPages.length;
         } else {
@@ -154,6 +158,7 @@ class PdfFile {
      * @param viewSize new size of changed view
      */
     public void recalculatePageSizes(Size viewSize) {
+        this.viewSize = viewSize;
         pageSizes.clear();
         PageSizeCalculator calculator = new PageSizeCalculator(pageFitPolicy, originalMaxWidthPageSize,
                 originalMaxHeightPageSize, viewSize, fitEachPage);
@@ -163,7 +168,7 @@ class PdfFile {
         int viewSizeHalfWidth = viewSize.getWidth() / 2;
         int realDisplayDualPage = PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SINGLE_PAGE;
         boolean maybeCanDisplayDualPage = this.autoSpacing && !this.isVertical;
-        if(maybeCanDisplayDualPage){
+        if (maybeCanDisplayDualPage) {
             realDisplayDualPage = PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE;
         }
         for (Size size : originalPageSizes) {
@@ -178,11 +183,38 @@ class PdfFile {
         }
         this.realDisplayDualPageType = realDisplayDualPage;
 
+        if (this.realDisplayDualPageType == PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
+            //คำนวนหน้าที่จะต้องติดกัน
+            this.calcDualPages();
+        }
         if (autoSpacing) {
             prepareAutoSpacing(viewSize);
         }
         prepareDocLen();
         preparePagesOffset();
+    }
+
+    final private List<DualPageDisplay> dualPageDisplays = new ArrayList<>();
+
+    //คำนวนหน้าที่จะต้องติดกัน
+    private void calcDualPages() {
+        this.dualPageDisplays.clear(); //ลบของเก่าออกให้หมด
+        int pageCount = this.getPagesCount();
+        int i = 0;
+        while (true) {
+            if (i >= pageCount) {
+                break;
+            }
+            int pageLeft = i;
+            i++;
+            if (i >= pageCount) {
+                dualPageDisplays.add(new DualPageDisplay(pageLeft, -1));
+                break;
+            }
+            int pageRight = i;
+            dualPageDisplays.add(new DualPageDisplay(pageLeft, pageRight));
+            i++;
+        }
     }
 
     public int getPagesCount() {
@@ -229,11 +261,17 @@ class PdfFile {
 
     private void prepareAutoSpacing(Size viewSize) {
         pageSpacing.clear();
-        for (int i = 0; i < getPagesCount(); i++) {
+        int pagesCount = this.getPagesCount();
+        for (int i = 0; i < pagesCount; i++) {
             SizeF pageSize = pageSizes.get(i);
             float spacing = Math.max(0, isVertical ? viewSize.getHeight() - pageSize.getHeight() :
                     viewSize.getWidth() - pageSize.getWidth());
-            if (i < getPagesCount() - 1) {
+            //สำหรับหน้าคู่
+            //if (this.realDisplayDualPageType == PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
+            //    spacing = Math.max(0, isVertical ? (viewSize.getHeight() / 2f) - pageSize.getHeight() :
+            //            (viewSize.getWidth() / 2f) - pageSize.getWidth());
+            //}
+            if (i < pagesCount - 1) {
                 spacing += spacingPx;
             }
             pageSpacing.add(spacing);
@@ -293,6 +331,31 @@ class PdfFile {
         return spacing * zoom;
     }
 
+    public float getPageOffsetForLocalTranslationX(int pageIndex, float zoom) {
+
+        //offset สำหรับหน้าคู่
+        if (this.viewSize != null && this.realDisplayDualPageType == PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
+            int index = DualPageDisplay.findIndexByPage(this.dualPageDisplays, pageIndex);
+            if (index != -1) {
+                DualPageDisplay display = this.dualPageDisplays.get(index);
+
+                //float offsetBefore = 0f;
+                float offsetBefore = this.viewSize.getWidth() * (index );
+
+
+                if (display.getPageLeft() == pageIndex) {
+                    float pageW = this.pageSizes.get(pageIndex).getWidth();
+                    return (offsetBefore + (this.viewSize.getWidth() / 2f) - pageW) * zoom;
+                } else if (display.getPageRight() == pageIndex) {
+                    return (offsetBefore + (this.viewSize.getWidth() / 2f)) * zoom;
+                }
+
+            }
+        }
+
+        return getPageOffset(pageIndex, zoom);
+    }
+
     /**
      * Get primary page offset, that is Y for vertical scroll and X for horizontal scroll
      */
@@ -320,7 +383,73 @@ class PdfFile {
         }
     }
 
+    //return int[2]  โดย {firstPage,lastPage,}
+    public int[] getPageAtOffsetForDualPage(float offsetFirst, float offsetLast, float zoom) {
+
+        int count = this.dualPageDisplays.size();
+        float viewWidth = this.viewSize.getWidth() * zoom;
+        int selected = -1;
+        for (int i = 0; i < count; i++) {
+            float offset = viewWidth * i;
+            if (offset >= offsetFirst) {
+                selected = i;
+                break;
+            }
+        }
+
+        if (selected < 0) {
+            selected = 0;
+        }
+
+        DualPageDisplay display = this.dualPageDisplays.get(selected);
+        int firstPage = display.getPageLeft();
+        int lastPage = display.getPageRight();
+        if (selected - 1 >= 0) {
+            int prev = selected - 1;
+            DualPageDisplay displayPrev = this.dualPageDisplays.get(prev);
+            if (displayPrev.getPageLeft() != -1) {
+                firstPage = displayPrev.getPageLeft();
+            } else if (displayPrev.getPageRight() != -1) {
+                firstPage = displayPrev.getPageRight();
+            }
+        }
+        if (selected + 1 < count) {
+            int next = selected + 1;
+            DualPageDisplay displayNext = this.dualPageDisplays.get(next);
+            if (displayNext.getPageRight() != -1) {
+                lastPage = displayNext.getPageRight();
+            } else if (displayNext.getPageLeft() != -1) {
+                lastPage = displayNext.getPageLeft();
+            }
+        }
+        return new int[]{firstPage, lastPage};
+    }
+
     public int getPageAtOffset(float offset, float zoom) {
+        /*
+        if (this.viewSize != null && this.realDisplayDualPageType == PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
+            int dualPageCount = this.dualPageDisplays.size();
+            int index = 0;
+            for (int i = 0; i < dualPageCount; i++) {
+                float off = this.viewSize.getWidth() * i;
+                if (off >= offset) {
+                    break;
+                }
+                index++;
+            }
+            index = index - 1;
+            if(index < 0 ){
+                index = 0;
+            }
+            DualPageDisplay display = this.dualPageDisplays.get(index);
+            if (display.getPageLeft() != -1) {
+                return display.getPageLeft();
+            } else if (display.getPageRight() != -1) {
+                return display.getPageRight();
+            }
+
+        }*/
+
         int currentPage = 0;
         for (int i = 0; i < getPagesCount(); i++) {
             float off = pageOffsets.get(i) * zoom - getPageSpacing(i, zoom) / 2f;
@@ -449,4 +578,6 @@ class PdfFile {
 
         return documentPage;
     }
+
+
 }
