@@ -197,8 +197,8 @@ class PdfFile {
 
     final private List<DualPageDisplay> dualPageDisplays = new ArrayList<>();
 
-    public List<DualPageDisplay> getDualPageDisplays(){
-        return  this.dualPageDisplays;
+    public List<DualPageDisplay> getDualPageDisplays() {
+        return this.dualPageDisplays;
     }
 
     //คำนวนหน้าที่จะต้องติดกัน
@@ -224,6 +224,10 @@ class PdfFile {
 
     public int getPagesCount() {
         return pagesCount;
+    }
+
+    public int getPageCountForDualPage() {
+        return this.dualPageDisplays.size();
     }
 
     public SizeF getPageSize(int pageIndex) {
@@ -392,7 +396,7 @@ class PdfFile {
             return null;
         }
 
-        return  (float)this.viewSize.getWidth() * index;
+        return (float) this.viewSize.getWidth() * index;
     }
 
     /**

@@ -133,7 +133,7 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
             float offsetX = -(pdfView.getCurrentXOffset() - (delta * pdfView.getZoom()));
             int count = this.pdfView.pdfFile.getDualPageDisplays().size();
             float pageWidth = this.pdfView.getWidth();
-            float offsetXCenter = offsetX + (pageWidth/2f);
+            float offsetXCenter = offsetX + (pageWidth / 2f);
             float offsetWidth = 0f;
             int selected = -1;
             for (int i = 0; i < count; i++) {
@@ -144,7 +144,7 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
                 }
             }
             int targetPage = Math.max(0, Math.min(count - 1, selected + direction));
-            animationManager.startPageFlingAnimation(-targetPage*pageWidth);
+            animationManager.startPageFlingAnimation(-targetPage * pageWidth);
             return;
         }
 

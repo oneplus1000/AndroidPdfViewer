@@ -418,11 +418,16 @@ public class PDFView extends RelativeLayout {
 
         loadPages();
 
+        Log.d("XX", "currentPage: " + currentPage);
         if (scrollHandle != null && !documentFitsView()) {
             scrollHandle.setPageNum(currentPage + 1);
         }
 
-        callbacks.callOnPageChange(currentPage, pdfFile.getPagesCount());
+        if (this.pdfFile.getRealDisplayDualPageType() == Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
+            callbacks.callOnPageChange(currentPage, pdfFile.getPageCountForDualPage());
+        } else {
+            callbacks.callOnPageChange(currentPage, pdfFile.getPagesCount());
+        }
     }
 
     /**
@@ -962,7 +967,11 @@ public class PDFView extends RelativeLayout {
 
         dragPinchManager.enable();
 
-        callbacks.callOnLoadComplete(pdfFile.getPagesCount());
+        if (this.pdfFile.getRealDisplayDualPageType() == Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
+            callbacks.callOnLoadComplete(pdfFile.getPageCountForDualPage());
+        } else {
+            callbacks.callOnLoadComplete(pdfFile.getPagesCount());
+        }
 
         jumpTo(defaultPage, false);
     }
@@ -1198,7 +1207,7 @@ public class PDFView extends RelativeLayout {
         return offset;
     }
 
-    int  findFocusPage(float xOffset, float yOffset) {
+    int findFocusPage(float xOffset, float yOffset) {
         float currOffset = swipeVertical ? yOffset : xOffset;
         float length = swipeVertical ? getHeight() : getWidth();
         // make sure first and last page can be found
