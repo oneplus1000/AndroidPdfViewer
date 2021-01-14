@@ -64,7 +64,7 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
         enabled = false;
     }
 
-    void disableLongpress(){
+    void disableLongpress() {
         gestureDetector.setIsLongpressEnabled(false);
     }
 
@@ -126,6 +126,28 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
             return;
         }
 
+        //สำหรับหน้าคู่
+        if (this.pdfView.pdfFile.getRealDisplayDualPageType() == PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
+            int direction = velocityX > 0 ? -1 : 1;
+            float delta = ev.getX() - downEvent.getX();
+            float offsetX = -(pdfView.getCurrentXOffset() - (delta * pdfView.getZoom()));
+            int count = this.pdfView.pdfFile.getDualPageDisplays().size();
+            float pageWidth = this.pdfView.getWidth();
+            float offsetXCenter = offsetX + (pageWidth/2f);
+            float offsetWidth = 0f;
+            int selected = -1;
+            for (int i = 0; i < count; i++) {
+                offsetWidth += pageWidth;
+                if (offsetWidth > offsetXCenter) {
+                    selected = i;
+                    break;
+                }
+            }
+            int targetPage = Math.max(0, Math.min(count - 1, selected + direction));
+            animationManager.startPageFlingAnimation(-targetPage*pageWidth);
+            return;
+        }
+
         int direction;
         if (pdfView.isSwipeVertical()) {
             direction = velocityY > 0 ? -1 : 1;
@@ -159,15 +181,14 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
             pdfView.resetZoomWithAnimation();
         }*/
         if (pdfView.getZoom() < pdfView.getMidZoom()) {
-            pdfView.callbacks.callOnPageZoom(e.getX(), e.getY(),pdfView.getZoom(),pdfView.getMidZoom());
+            pdfView.callbacks.callOnPageZoom(e.getX(), e.getY(), pdfView.getZoom(), pdfView.getMidZoom());
             pdfView.zoomWithAnimation(e.getX(), e.getY(), pdfView.getMidZoom());
         } else {
-            pdfView.callbacks.callOnPageZoom(e.getX(), e.getY(),pdfView.getZoom(),pdfView.getMinZoom());
+            pdfView.callbacks.callOnPageZoom(e.getX(), e.getY(), pdfView.getZoom(), pdfView.getMinZoom());
             pdfView.resetZoomWithAnimation();
         }
         return true;
     }
-
 
 
     @Override
@@ -286,7 +307,7 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
             dr = maxZoom / pdfView.getZoom();
         }
         pdfView.zoomCenteredRelativeTo(dr, new PointF(detector.getFocusX(), detector.getFocusY()));
-        pdfView.callbacks.callOnPageZoom(detector.getFocusX(), detector.getFocusY(),pdfView.getZoom(),dr);
+        pdfView.callbacks.callOnPageZoom(detector.getFocusX(), detector.getFocusY(), pdfView.getZoom(), dr);
         return true;
     }
 

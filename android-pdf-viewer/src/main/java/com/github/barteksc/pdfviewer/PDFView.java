@@ -300,6 +300,7 @@ public class PDFView extends RelativeLayout {
     private int placeHoldColor = Color.WHITE;
 
     private int requestDisplayDualPageType = Configurator.REQUEST_DISPLAY_DUALPAGE_TYPE_ONLY_SINGLE_PAGE;
+
     /**
      * Construct the initial view
      */
@@ -313,14 +314,14 @@ public class PDFView extends RelativeLayout {
         this.placeHoldColor = color;
     }
 
-    public void setRequestDisplayDualPageType(int pageType){
+    public void setRequestDisplayDualPageType(int pageType) {
         this.requestDisplayDualPageType = pageType;
     }
 
     public int getRequestDisplayDualPageType() {
         return this.requestDisplayDualPageType;
     }
-    
+
     /**
      * Construct the initial view
      */
@@ -807,7 +808,7 @@ public class PDFView extends RelativeLayout {
             float maxHeight = pdfFile.getMaxPageHeight(currentPageJumpTo);
             localTranslationY = toCurrentScale(maxHeight - size.getHeight()) / 2;
         }
-        Log.d("XXX","localTranslationX ="+localTranslationX + "   "+part.getPage());
+        //Log.d("XXX","localTranslationX ="+localTranslationX + "   "+part.getPage());
         //localTranslationY = 889;
         //canvas.translate(localTranslationX, localTranslationY);
         canvas.translate(localTranslationX, localTranslationY);
@@ -1173,8 +1174,19 @@ public class PDFView extends RelativeLayout {
      * Get the offset to move to in order to snap to the page
      */
     float snapOffsetForPage(int pageIndex, SnapEdge edge) {
-        float offset = pdfFile.getPageOffset(pageIndex, zoom);
 
+
+        //สำหรับหน้าคู่
+        //if (this.pdfFile.getRealDisplayDualPageType() == Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
+        //    Float snapOffset = this.pdfFile.snapOffsetForPage(pageIndex, edge);
+        //    if (snapOffset != null) {
+        //        Log.d("XX", " pageIndex = " + pageIndex + " snapOffset = "+snapOffset);
+        //        return snapOffset;
+        //    }
+        //}
+
+
+        float offset = pdfFile.getPageOffset(pageIndex, zoom);
         float length = swipeVertical ? getHeight() : getWidth();
         float pageLength = pdfFile.getPageLength(pageIndex, zoom);
 
@@ -1186,7 +1198,7 @@ public class PDFView extends RelativeLayout {
         return offset;
     }
 
-    int findFocusPage(float xOffset, float yOffset) {
+    int  findFocusPage(float xOffset, float yOffset) {
         float currOffset = swipeVertical ? yOffset : xOffset;
         float length = swipeVertical ? getHeight() : getWidth();
         // make sure first and last page can be found

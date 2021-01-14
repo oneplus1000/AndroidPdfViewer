@@ -25,6 +25,7 @@ import com.github.barteksc.pdfviewer.exception.PageRenderingException;
 import com.github.barteksc.pdfviewer.model.DualPageDisplay;
 import com.github.barteksc.pdfviewer.util.FitPolicy;
 import com.github.barteksc.pdfviewer.util.PageSizeCalculator;
+import com.github.barteksc.pdfviewer.util.SnapEdge;
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
 import com.shockwave.pdfium.util.Size;
@@ -196,6 +197,10 @@ class PdfFile {
 
     final private List<DualPageDisplay> dualPageDisplays = new ArrayList<>();
 
+    public List<DualPageDisplay> getDualPageDisplays(){
+        return  this.dualPageDisplays;
+    }
+
     //คำนวนหน้าที่จะต้องติดกัน
     private void calcDualPages() {
         this.dualPageDisplays.clear(); //ลบของเก่าออกให้หมด
@@ -279,6 +284,14 @@ class PdfFile {
     }
 
     private void prepareDocLen() {
+
+        //หน้าคู่
+        //if (this.viewSize != null && this.realDisplayDualPageType == PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
+        //    int count = this.dualPageDisplays.size();
+        //    this.documentLength = count * this.viewSize.getWidth();
+        //    return;
+        //}
+
         float length = 0;
         for (int i = 0; i < getPagesCount(); i++) {
             SizeF pageSize = pageSizes.get(i);
@@ -315,6 +328,14 @@ class PdfFile {
     }
 
     public float getDocLen(float zoom) {
+
+        //หน้าคู่
+        if (this.viewSize != null && this.realDisplayDualPageType == PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
+            int count = this.dualPageDisplays.size();
+            float length = count * this.viewSize.getWidth();
+            return length * zoom;
+        }
+
         return documentLength * zoom;
     }
 
@@ -340,7 +361,7 @@ class PdfFile {
                 DualPageDisplay display = this.dualPageDisplays.get(index);
 
                 //float offsetBefore = 0f;
-                float offsetBefore = this.viewSize.getWidth() * (index );
+                float offsetBefore = this.viewSize.getWidth() * (index);
 
 
                 if (display.getPageLeft() == pageIndex) {
@@ -354,6 +375,24 @@ class PdfFile {
         }
 
         return getPageOffset(pageIndex, zoom);
+    }
+
+    public Float snapOffsetForPage(int pageIndex, SnapEdge edge) {
+
+        if (this.viewSize == null) {
+            return null;
+        }
+
+        if (this.realDisplayDualPageType != PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
+            return null;
+        }
+
+        int index = DualPageDisplay.findIndexByPage(this.dualPageDisplays, pageIndex);
+        if (index == -1) {
+            return null;
+        }
+
+        return  (float)this.viewSize.getWidth() * index;
     }
 
     /**
