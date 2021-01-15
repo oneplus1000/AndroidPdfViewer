@@ -318,9 +318,6 @@ public class PDFView extends RelativeLayout {
         this.requestDisplayDualPageType = pageType;
     }
 
-    public int getRequestDisplayDualPageType() {
-        return this.requestDisplayDualPageType;
-    }
 
     /**
      * Construct the initial view
@@ -328,6 +325,18 @@ public class PDFView extends RelativeLayout {
     public PDFView(Context context, AttributeSet set) {
         super(context, set);
         initPDFView(context);
+    }
+
+
+    public int getRequestDisplayDualPageType() {
+        return this.requestDisplayDualPageType;
+    }
+
+    public int getRealDisplayDualPageType() {
+        if (this.pdfFile == null) {
+            return -1;
+        }
+        return this.pdfFile.getRealDisplayDualPageType();
     }
 
     private void initPDFView(Context context) {

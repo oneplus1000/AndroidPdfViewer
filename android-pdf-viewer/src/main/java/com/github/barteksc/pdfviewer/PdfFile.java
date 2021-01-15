@@ -127,6 +127,10 @@ class PdfFile {
         setup(viewSize);
     }
 
+    public int getRequestDisplayDualPageType(){
+        return this.requestDisplayDualPageType;
+    }
+
     public int getRealDisplayDualPageType() {
         return this.realDisplayDualPageType;
     }
