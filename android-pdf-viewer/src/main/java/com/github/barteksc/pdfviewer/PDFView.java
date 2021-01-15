@@ -434,9 +434,9 @@ public class PDFView extends RelativeLayout {
         }
 
         if (this.pdfFile.getRealDisplayDualPageType() == Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
-            callbacks.callOnPageChange(currentPage, pdfFile.getPageCountForDualPage());
+            callbacks.callOnPageChange(currentPage, pdfFile.getPageCountForDualPage(), pdfFile);
         } else {
-            callbacks.callOnPageChange(currentPage, pdfFile.getPagesCount());
+            callbacks.callOnPageChange(currentPage, pdfFile.getPagesCount(), pdfFile);
         }
     }
 
@@ -956,13 +956,17 @@ public class PDFView extends RelativeLayout {
 
     }
 
+    public int getDisplayPageNumber(int page) {
+        return -1;
+    }
+
     /**
      * Called when the PDF is loaded
      */
     void loadComplete(PdfFile pdfFile) {
 
 
-        if(pdfFile.getRealDisplayDualPageType() == Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE){
+        if (pdfFile.getRealDisplayDualPageType() == Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
             //เนื่องจาก this.defaultPage เริ่มต้นมาจะเป็นของแบบหน้าเดี่ยวๆเสมอ ถ้าเปิดมาเป็นหน้าคู่เราจะปรับให้้ไปตามจุดจริงตามแบบหน้าคู่
             this.defaultPage = DualPageDisplay.findIndexByPage(pdfFile.getDualPageDisplays(), this.defaultPage);
         }
@@ -989,7 +993,6 @@ public class PDFView extends RelativeLayout {
         } else {
             callbacks.callOnLoadComplete(pdfFile.getPagesCount());
         }
-        
 
 
         jumpTo(defaultPage, false);

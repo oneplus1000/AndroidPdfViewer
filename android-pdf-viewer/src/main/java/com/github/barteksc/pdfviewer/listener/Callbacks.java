@@ -17,6 +17,7 @@ package com.github.barteksc.pdfviewer.listener;
 
 import android.view.MotionEvent;
 
+import com.github.barteksc.pdfviewer.PdfFile;
 import com.github.barteksc.pdfviewer.link.LinkHandler;
 import com.github.barteksc.pdfviewer.model.LinkTapEvent;
 
@@ -120,9 +121,9 @@ public class Callbacks {
         this.onPageChangeListener = onPageChangeListener;
     }
 
-    public void callOnPageChange(int page, int pagesCount) {
+    public void callOnPageChange(int page, int pagesCount, PdfFile pdfFile) {
         if (onPageChangeListener != null) {
-            onPageChangeListener.onPageChanged(page, pagesCount);
+            onPageChangeListener.onPageChanged(page, pagesCount, pdfFile);
         }
     }
 
@@ -181,13 +182,13 @@ public class Callbacks {
     }
 
     public void setOnPageZoom(OnPageZoomListener listener) {
-        if(listener != null){
+        if (listener != null) {
             this.onPageZoomListener = listener;
         }
     }
 
-    public void callOnPageZoom(float centerX, float centerY, float zoomFrom, float zoomTo){
-        if(this.onPageZoomListener == null){
+    public void callOnPageZoom(float centerX, float centerY, float zoomFrom, float zoomTo) {
+        if (this.onPageZoomListener == null) {
             return;
         }
         this.onPageZoomListener.zoom(centerX, centerY, zoomFrom, zoomTo);

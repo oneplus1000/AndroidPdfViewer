@@ -15,6 +15,8 @@
  */
 package com.github.barteksc.pdfviewer.listener;
 
+import com.github.barteksc.pdfviewer.PdfFile;
+
 /**
  * Implements this interface to receive events from PDFView
  * when a page has changed through swipe
@@ -27,6 +29,6 @@ public interface OnPageChangeListener {
      * @param page      the new page displayed, starting from 0
      * @param pageCount the total page count
      */
-    void onPageChanged(int page, int pageCount);
+    void onPageChanged(int page, int pageCount, PdfFile pdfFile);
 
 }

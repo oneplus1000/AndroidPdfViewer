@@ -34,7 +34,7 @@ import com.shockwave.pdfium.util.SizeF;
 import java.util.ArrayList;
 import java.util.List;
 
-class PdfFile {
+public class PdfFile {
 
     private static final Object lock = new Object();
     private PdfDocument pdfDocument;
