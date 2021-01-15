@@ -51,6 +51,7 @@ import com.github.barteksc.pdfviewer.listener.OnPageScrollListener;
 import com.github.barteksc.pdfviewer.listener.OnPageZoomListener;
 import com.github.barteksc.pdfviewer.listener.OnRenderListener;
 import com.github.barteksc.pdfviewer.listener.OnTapListener;
+import com.github.barteksc.pdfviewer.model.DualPageDisplay;
 import com.github.barteksc.pdfviewer.model.PagePart;
 import com.github.barteksc.pdfviewer.scroll.ScrollHandle;
 import com.github.barteksc.pdfviewer.source.AssetSource;
@@ -959,6 +960,13 @@ public class PDFView extends RelativeLayout {
      * Called when the PDF is loaded
      */
     void loadComplete(PdfFile pdfFile) {
+
+
+        if(pdfFile.getRealDisplayDualPageType() == Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE){
+            //เนื่องจาก this.defaultPage เริ่มตั้นมาจะเป็นของแบบหน้าเดี่ยวๆเสมอ ถ้าเปิดมาเป็นหน้าคู่เราจะปรับให้้ไปตามจุดจริงตามแบบหน้าคู่
+            this.defaultPage = DualPageDisplay.findIndexByPage(pdfFile.getDualPageDisplays(), this.defaultPage);
+        }
+
         state = State.LOADED;
 
         this.pdfFile = pdfFile;
@@ -981,6 +989,8 @@ public class PDFView extends RelativeLayout {
         } else {
             callbacks.callOnLoadComplete(pdfFile.getPagesCount());
         }
+        
+
 
         jumpTo(defaultPage, false);
     }
