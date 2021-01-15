@@ -963,7 +963,7 @@ public class PDFView extends RelativeLayout {
 
 
         if(pdfFile.getRealDisplayDualPageType() == Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE){
-            //เนื่องจาก this.defaultPage เริ่มตั้นมาจะเป็นของแบบหน้าเดี่ยวๆเสมอ ถ้าเปิดมาเป็นหน้าคู่เราจะปรับให้้ไปตามจุดจริงตามแบบหน้าคู่
+            //เนื่องจาก this.defaultPage เริ่มต้นมาจะเป็นของแบบหน้าเดี่ยวๆเสมอ ถ้าเปิดมาเป็นหน้าคู่เราจะปรับให้้ไปตามจุดจริงตามแบบหน้าคู่
             this.defaultPage = DualPageDisplay.findIndexByPage(pdfFile.getDualPageDisplays(), this.defaultPage);
         }
 
