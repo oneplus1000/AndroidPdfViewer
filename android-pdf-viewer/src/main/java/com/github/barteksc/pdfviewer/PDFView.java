@@ -335,7 +335,7 @@ public class PDFView extends RelativeLayout {
 
     public int getRealDisplayDualPageType() {
         if (this.pdfFile == null) {
-            return -1;
+            return Configurator.REAL_DISPLAY_DUALPAGE_TYPE_UNKNOW;
         }
         return this.pdfFile.getRealDisplayDualPageType();
     }
@@ -989,9 +989,9 @@ public class PDFView extends RelativeLayout {
         dragPinchManager.enable();
 
         if (this.pdfFile.getRealDisplayDualPageType() == Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
-            callbacks.callOnLoadComplete(pdfFile.getPageCountForDualPage());
+            callbacks.callOnLoadComplete(pdfFile.getPageCountForDualPage(),pdfFile);
         } else {
-            callbacks.callOnLoadComplete(pdfFile.getPagesCount());
+            callbacks.callOnLoadComplete(pdfFile.getPagesCount(),pdfFile);
         }
 
 
@@ -1648,6 +1648,7 @@ public class PDFView extends RelativeLayout {
         final public static int REQUEST_DISPLAY_DUALPAGE_TYPE_ONLY_SINGLE_PAGE = 0;
         final public static int REQUEST_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE_IF_IT_CAN = 1; //โชว์ page คู่ถ้าเป็นไปได้
 
+        final public static int REAL_DISPLAY_DUALPAGE_TYPE_UNKNOW = -1;
         final public static int REAL_DISPLAY_DUALPAGE_TYPE_SINGLE_PAGE = 100;
         final public static int REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE = 101;
         private int requestDisplayDualPageType = REQUEST_DISPLAY_DUALPAGE_TYPE_ONLY_SINGLE_PAGE;

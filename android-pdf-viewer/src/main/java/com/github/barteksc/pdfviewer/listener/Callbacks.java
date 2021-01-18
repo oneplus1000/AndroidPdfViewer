@@ -81,9 +81,9 @@ public class Callbacks {
         this.onLoadCompleteListener = onLoadCompleteListener;
     }
 
-    public void callOnLoadComplete(int pagesCount) {
+    public void callOnLoadComplete(int pagesCount, PdfFile pdfFile) {
         if (onLoadCompleteListener != null) {
-            onLoadCompleteListener.loadComplete(pagesCount);
+            onLoadCompleteListener.loadComplete(pagesCount, pdfFile);
         }
     }
 
