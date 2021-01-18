@@ -328,6 +328,10 @@ public class PDFView extends RelativeLayout {
         initPDFView(context);
     }
 
+    public PdfFile getPdfFile(){
+        return this.pdfFile;
+    }
+
 
     public int getRequestDisplayDualPageType() {
         return this.requestDisplayDualPageType;
@@ -1648,6 +1652,7 @@ public class PDFView extends RelativeLayout {
         final public static int REQUEST_DISPLAY_DUALPAGE_TYPE_ONLY_SINGLE_PAGE = 0;
         final public static int REQUEST_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE_IF_IT_CAN = 1; //โชว์ page คู่ถ้าเป็นไปได้
 
+        final public static int REAL_DISPLAY_DUALPAGE_TYPE_UNKNOW = -1;
         final public static int REAL_DISPLAY_DUALPAGE_TYPE_SINGLE_PAGE = 100;
         final public static int REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE = 101;
         private int requestDisplayDualPageType = REQUEST_DISPLAY_DUALPAGE_TYPE_ONLY_SINGLE_PAGE;
