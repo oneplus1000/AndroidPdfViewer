@@ -127,7 +127,7 @@ public class PdfFile {
         setup(viewSize);
     }
 
-    public int getRequestDisplayDualPageType(){
+    public int getRequestDisplayDualPageType() {
         return this.requestDisplayDualPageType;
     }
 
@@ -172,7 +172,10 @@ public class PdfFile {
 
         int viewSizeHalfWidth = viewSize.getWidth() / 2;
         int realDisplayDualPage = PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SINGLE_PAGE;
-        boolean maybeCanDisplayDualPage = this.autoSpacing && !this.isVertical;
+
+        boolean maybeCanDisplayDualPage = this.autoSpacing &&
+                !this.isVertical &&
+                this.requestDisplayDualPageType == PDFView.Configurator.REQUEST_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE_IF_IT_CAN;
         if (maybeCanDisplayDualPage) {
             realDisplayDualPage = PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE;
         }
@@ -180,12 +183,13 @@ public class PdfFile {
             SizeF pageSize = calculator.calculate(size);
             pageSizes.add(pageSize);
             //ตรวจสอบว่าหน้าจอพอดีกับการแสดงหน้าคู่หรือไม่??
-            if (this.autoSpacing && !this.isVertical) {
+            if (maybeCanDisplayDualPage) {
                 if (pageSize.getWidth() > viewSizeHalfWidth) { //ขนาดเกินแสดงไม่ได้
                     realDisplayDualPage = PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SINGLE_PAGE;
                 }
             }
         }
+
         this.realDisplayDualPageType = realDisplayDualPage;
 
         if (this.realDisplayDualPageType == PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
