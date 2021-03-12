@@ -35,14 +35,16 @@ class DecodingAsyncTask extends AsyncTask<Void, Void, Throwable> {
     private DocumentSource docSource;
     private int[] userPages;
     private PdfFile pdfFile;
+    private boolean isRTL;
 
-    DecodingAsyncTask(DocumentSource docSource, String password, int[] userPages, PDFView pdfView, PdfiumCore pdfiumCore) {
+    DecodingAsyncTask(DocumentSource docSource, String password, boolean isRTL, int[] userPages, PDFView pdfView, PdfiumCore pdfiumCore) {
         this.docSource = docSource;
         this.userPages = userPages;
         this.cancelled = false;
         this.pdfViewReference = new WeakReference<>(pdfView);
         this.password = password;
         this.pdfiumCore = pdfiumCore;
+        this.isRTL = isRTL;
     }
 
     @Override
@@ -51,7 +53,7 @@ class DecodingAsyncTask extends AsyncTask<Void, Void, Throwable> {
             PDFView pdfView = pdfViewReference.get();
             if (pdfView != null) {
                 PdfDocument pdfDocument = docSource.createDocument(pdfView.getContext(), pdfiumCore, password);
-                pdfFile = new PdfFile(pdfiumCore, pdfDocument, pdfView.getPageFitPolicy(), getViewSize(pdfView),
+                pdfFile = new PdfFile(pdfiumCore, pdfDocument, pdfView.getPageFitPolicy(), getViewSize(pdfView), this.isRTL,
                         userPages, pdfView.isSwipeVertical(), pdfView.getSpacingPx(), pdfView.isAutoSpacingEnabled(),
                         pdfView.isFitEachPage(), pdfView.getRequestDisplayDualPageType());
                 return null;

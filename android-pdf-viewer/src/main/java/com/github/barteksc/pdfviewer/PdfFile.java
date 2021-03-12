@@ -32,6 +32,7 @@ import com.shockwave.pdfium.util.Size;
 import com.shockwave.pdfium.util.SizeF;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class PdfFile {
@@ -112,7 +113,9 @@ public class PdfFile {
 
     private Size viewSize = null;
 
-    PdfFile(PdfiumCore pdfiumCore, PdfDocument pdfDocument, FitPolicy pageFitPolicy, Size viewSize, int[] originalUserPages,
+    private boolean isRTL = false;
+
+    PdfFile(PdfiumCore pdfiumCore, PdfDocument pdfDocument, FitPolicy pageFitPolicy, Size viewSize, boolean isRTL, int[] originalUserPages,
             boolean isVertical, int spacing, boolean autoSpacing, boolean fitEachPage,
             int requestDisplayDualPageType) {
         this.pdfiumCore = pdfiumCore;
@@ -124,6 +127,7 @@ public class PdfFile {
         this.autoSpacing = autoSpacing;
         this.fitEachPage = fitEachPage;
         this.requestDisplayDualPageType = requestDisplayDualPageType;
+        this.isRTL = isRTL;
         setup(viewSize);
     }
 
@@ -213,20 +217,63 @@ public class PdfFile {
     private void calcDualPages() {
         this.dualPageDisplays.clear(); //ลบของเก่าออกให้หมด
         int pageCount = this.getPagesCount();
-        int i = 0;
-        while (true) {
-            if (i >= pageCount) {
-                break;
+
+        //TODO อันนี้ต้องรับมาจาก  bookshelf
+        List<Integer> pageBreaks = new ArrayList<Integer>();
+        pageBreaks.add(1);
+        pageBreaks.add(2);
+
+        if (isRTL) {
+            int i = pageCount - 1;
+            while (true) {
+                if (i < 0) {
+                    break;
+                }
+                int pageRight = i;
+                if (pageBreaks.contains(pageCount - i)) {
+                    dualPageDisplays.add(new DualPageDisplay(-1, pageRight));
+                    i--;
+                    continue;
+                }
+                i--;
+                if (i < 0) {
+                    dualPageDisplays.add(new DualPageDisplay(-1, pageRight));
+                    break;
+                }
+                int pageLeft = i;
+                dualPageDisplays.add(new DualPageDisplay(pageLeft, pageRight));
+                i--;
             }
-            int pageLeft = i;
-            i++;
-            if (i >= pageCount) {
-                dualPageDisplays.add(new DualPageDisplay(pageLeft, -1));
-                break;
+            Collections.reverse(dualPageDisplays);
+        } else {
+
+            int i = 0;
+            while (true) {
+                if (i >= pageCount) {
+                    break;
+                }
+                int pageLeft = i;
+
+                if (pageBreaks.contains(i + 1)) {
+                    dualPageDisplays.add(new DualPageDisplay(pageLeft, -1));
+                    i++;
+                    continue;
+                }
+
+                i++;
+                if (i >= pageCount) {
+                    dualPageDisplays.add(new DualPageDisplay(pageLeft, -1));
+                    break;
+                }
+                int pageRight = i;
+                dualPageDisplays.add(new DualPageDisplay(pageLeft, pageRight));
+                i++;
             }
-            int pageRight = i;
-            dualPageDisplays.add(new DualPageDisplay(pageLeft, pageRight));
-            i++;
+        }
+
+
+        for (DualPageDisplay d : dualPageDisplays) {
+            Log.d("XX", "KK " + d.debug());
         }
     }
 
@@ -374,12 +421,17 @@ public class PdfFile {
 
                 //float offsetBefore = 0f;
                 float offsetBefore = this.viewSize.getWidth() * (index);
-
-
                 if (display.getPageLeft() == pageIndex) {
-                    float pageW = this.pageSizes.get(pageIndex).getWidth();
-                    return (offsetBefore + (this.viewSize.getWidth() / 2f) - pageW) * zoom;
+                    float offset = this.pageSizes.get(pageIndex).getWidth();
+                    if (display.getPageRight() == -1) {  //ถ้าไม่มีหน้าคู่มันจะต้องอยู่ตรงกลาง
+                        return (offsetBefore + (this.viewSize.getWidth() / 2f) - (offset / 2)) * zoom;
+                    }
+                    return (offsetBefore + (this.viewSize.getWidth() / 2f) - offset) * zoom;
                 } else if (display.getPageRight() == pageIndex) {
+                    if (display.getPageLeft() == -1) {//ถ้าไม่มีหน้าคู่มันจะต้องอยู่ตรงกลาง
+                        float offset = this.pageSizes.get(pageIndex).getWidth();
+                        return (offsetBefore + (this.viewSize.getWidth() / 2f) - (offset / 2)) * zoom;
+                    }
                     return (offsetBefore + (this.viewSize.getWidth() / 2f)) * zoom;
                 }
 
@@ -452,6 +504,42 @@ public class PdfFile {
             selected = 0;
         }
 
+
+        DualPageDisplay displayStart = null;
+        DualPageDisplay displayEnd = null;
+        if (selected - 1 >= 0) {
+            int prev = selected - 1;
+            displayStart = this.dualPageDisplays.get(prev);
+        } else {
+            displayStart = this.dualPageDisplays.get(selected);
+        }
+
+        if (selected + 1 < count) {
+            int next = selected + 1;
+            displayEnd = this.dualPageDisplays.get(next);
+        }
+
+        int firstPage = displayStart.getPageLeft();
+        int lastPage = firstPage;
+        if (firstPage == -1) {
+            firstPage = displayStart.getPageRight();
+        }
+        if (displayStart.getPageRight() != -1) {
+            lastPage = displayStart.getPageRight();
+        }
+
+        if (displayEnd != null) {
+            lastPage = displayEnd.getPageRight();
+            if (lastPage == -1) {
+                lastPage = displayEnd.getPageLeft();
+            }
+        }
+
+
+
+
+
+        /*
         DualPageDisplay display = this.dualPageDisplays.get(selected);
         int firstPage = display.getPageLeft();
         int lastPage = display.getPageRight();
@@ -472,7 +560,8 @@ public class PdfFile {
             } else if (displayNext.getPageLeft() != -1) {
                 lastPage = displayNext.getPageLeft();
             }
-        }
+        }*/
+
         return new int[]{firstPage, lastPage};
     }
 

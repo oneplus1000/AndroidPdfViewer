@@ -328,7 +328,7 @@ public class PDFView extends RelativeLayout {
         initPDFView(context);
     }
 
-    public PdfFile getPdfFile(){
+    public PdfFile getPdfFile() {
         return this.pdfFile;
     }
 
@@ -369,11 +369,11 @@ public class PDFView extends RelativeLayout {
         setWillNotDraw(false);
     }
 
-    private void load(DocumentSource docSource, String password) {
-        load(docSource, password, null);
+    private void load(DocumentSource docSource, String password, boolean isRTL) {
+        load(docSource, password, isRTL);
     }
 
-    private void load(DocumentSource docSource, String password, int[] userPages) {
+    private void load(DocumentSource docSource, String password, int[] userPages, boolean isRTL) {
 
         if (!recycled) {
             throw new IllegalStateException("Don't call load on a PDF View without recycling it first.");
@@ -381,7 +381,7 @@ public class PDFView extends RelativeLayout {
         placeHoldPaint.setColor(this.placeHoldColor);
         recycled = false;
         // Start decoding document
-        decodingAsyncTask = new DecodingAsyncTask(docSource, password, userPages, this, pdfiumCore);
+        decodingAsyncTask = new DecodingAsyncTask(docSource, password, isRTL, userPages, this, pdfiumCore);
         decodingAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
@@ -1591,6 +1591,8 @@ public class PDFView extends RelativeLayout {
 
         private int[] pageNumbers = null;
 
+        private boolean isRTL = false;
+
         private boolean enableSwipe = true;
 
         private boolean enableDoubletap = true;
@@ -1661,8 +1663,9 @@ public class PDFView extends RelativeLayout {
             this.documentSource = documentSource;
         }
 
-        public Configurator pages(int... pageNumbers) {
+        public Configurator pages(boolean isRTL, int... pageNumbers) {
             this.pageNumbers = pageNumbers;
+            this.isRTL = isRTL;
             return this;
         }
 
@@ -1861,9 +1864,9 @@ public class PDFView extends RelativeLayout {
 
 
             if (pageNumbers != null) {
-                PDFView.this.load(documentSource, password, pageNumbers);
+                PDFView.this.load(documentSource, password, pageNumbers, isRTL);
             } else {
-                PDFView.this.load(documentSource, password);
+                PDFView.this.load(documentSource, password, isRTL);
             }
         }
     }
