@@ -302,6 +302,14 @@ public class PDFView extends RelativeLayout {
 
     private int requestDisplayDualPageType = Configurator.REQUEST_DISPLAY_DUALPAGE_TYPE_ONLY_SINGLE_PAGE;
 
+    private ArrayList<Integer> pageBreaks;
+    public void setPageBreaks(ArrayList<Integer> pageBreaks){
+        this.pageBreaks = pageBreaks;
+    }
+
+    public ArrayList<Integer> getPageBreaks(){
+        return this.pageBreaks;
+    }
     /**
      * Construct the initial view
      */
@@ -318,6 +326,7 @@ public class PDFView extends RelativeLayout {
     public void setRequestDisplayDualPageType(int pageType) {
         this.requestDisplayDualPageType = pageType;
     }
+
 
 
     /**
@@ -1659,6 +1668,8 @@ public class PDFView extends RelativeLayout {
         final public static int REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE = 101;
         private int requestDisplayDualPageType = REQUEST_DISPLAY_DUALPAGE_TYPE_ONLY_SINGLE_PAGE;
 
+        private ArrayList<Integer> pageBreaks = null;
+
         private Configurator(DocumentSource documentSource) {
             this.documentSource = documentSource;
         }
@@ -1826,6 +1837,11 @@ public class PDFView extends RelativeLayout {
             return this;
         }
 
+        public Configurator setPageBreaks(ArrayList<Integer> pageBreaks){
+            this.pageBreaks = pageBreaks;
+            return this;
+        }
+
         public void load() {
             if (!hasSize) {
                 waitingDocumentConfigurator = this;
@@ -1860,6 +1876,7 @@ public class PDFView extends RelativeLayout {
             PDFView.this.setPageFling(pageFling);
             PDFView.this.setColorFilter(colorFilter);
             PDFView.this.setRequestDisplayDualPageType(requestDisplayDualPageType);
+            PDFView.this.setPageBreaks(pageBreaks);
             //PDFView.this.setPlaceHoldColor(placeHoldColor);
 
 

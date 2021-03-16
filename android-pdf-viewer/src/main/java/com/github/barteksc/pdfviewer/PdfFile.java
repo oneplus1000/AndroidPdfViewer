@@ -115,9 +115,11 @@ public class PdfFile {
 
     private boolean isRTL = false;
 
+    private ArrayList<Integer> pageBreaks;
+
     PdfFile(PdfiumCore pdfiumCore, PdfDocument pdfDocument, FitPolicy pageFitPolicy, Size viewSize, boolean isRTL, int[] originalUserPages,
             boolean isVertical, int spacing, boolean autoSpacing, boolean fitEachPage,
-            int requestDisplayDualPageType) {
+            int requestDisplayDualPageType, ArrayList<Integer> pageBreaks) {
         this.pdfiumCore = pdfiumCore;
         this.pdfDocument = pdfDocument;
         this.pageFitPolicy = pageFitPolicy;
@@ -128,6 +130,7 @@ public class PdfFile {
         this.fitEachPage = fitEachPage;
         this.requestDisplayDualPageType = requestDisplayDualPageType;
         this.isRTL = isRTL;
+        this.pageBreaks = pageBreaks;
         setup(viewSize);
     }
 
@@ -217,12 +220,7 @@ public class PdfFile {
     private void calcDualPages() {
         this.dualPageDisplays.clear(); //ลบของเก่าออกให้หมด
         int pageCount = this.getPagesCount();
-
-        //TODO อันนี้ต้องรับมาจาก  bookshelf
-        List<Integer> pageBreaks = new ArrayList<Integer>();
-        pageBreaks.add(1);
-        pageBreaks.add(2);
-
+        List<Integer> breaks = this.pageBreaks;
         if (isRTL) {
             int i = pageCount - 1;
             while (true) {
@@ -230,7 +228,7 @@ public class PdfFile {
                     break;
                 }
                 int pageRight = i;
-                if (pageBreaks.contains(pageCount - i)) {
+                if (breaks.contains(pageCount - i)) {
                     dualPageDisplays.add(new DualPageDisplay(-1, pageRight));
                     i--;
                     continue;
@@ -246,7 +244,6 @@ public class PdfFile {
             }
             Collections.reverse(dualPageDisplays);
         } else {
-
             int i = 0;
             while (true) {
                 if (i >= pageCount) {
@@ -254,7 +251,7 @@ public class PdfFile {
                 }
                 int pageLeft = i;
 
-                if (pageBreaks.contains(i + 1)) {
+                if (breaks.contains(i + 1)) {
                     dualPageDisplays.add(new DualPageDisplay(pageLeft, -1));
                     i++;
                     continue;
