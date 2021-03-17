@@ -147,7 +147,7 @@ class PagesLoader {
             lastPage = pdfView.pdfFile.getPageAtOffset(offsetLast, pdfView.getZoom());
         }
         //int pageCount = lastPage - firstPage + 1;
-        Log.d("XX", "firstPage :" + firstPage + " lastPage:" + lastPage + "  offsetFirst:" + offsetFirst + " offsetLast:" + offsetLast);
+        //Log.d("XX", "firstPage :" + firstPage + " lastPage:" + lastPage + "  offsetFirst:" + offsetFirst + " offsetLast:" + offsetLast);
 
 
         List<RenderRange> renderRanges = new LinkedList<>();
@@ -253,12 +253,12 @@ class PagesLoader {
 
         List<RenderRange> rangeList = getRenderRangeList(firstXOffset, firstYOffset, lastXOffset, lastYOffset);
 
-        String debug = "rangeList: ";
+        //String debug = "rangeList: ";
         for (RenderRange range : rangeList) {
             loadThumbnail(range.page);
-            debug = debug + " " + range.page;
+            //debug = debug + " " + range.page;
         }
-        Log.d("XX", " >> " + debug);
+        //Log.d("XX", " >> " + debug);
 
         for (RenderRange range : rangeList) {
             calculatePartSize(range.gridSize);

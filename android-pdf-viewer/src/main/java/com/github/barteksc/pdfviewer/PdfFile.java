@@ -533,7 +533,7 @@ public class PdfFile {
                 lastPage = displayEnd.getPageLeft();
             }
         }
-        
+
         return new int[]{firstPage, lastPage};
     }
 
