@@ -48,7 +48,7 @@ class CacheManager {
     public CacheManager() {
         activeCache = new PriorityQueue<>(CACHE_SIZE, orderComparator);
         passiveCache = new PriorityQueue<>(CACHE_SIZE, orderComparator);
-        placeHolders =  new ArrayList<>();
+        placeHolders = new ArrayList<>();
         thumbnails = new ArrayList<>();
     }
 
@@ -99,8 +99,8 @@ class CacheManager {
 
     public void cachePlaceHolders(PagePart part) {
         synchronized (this.placeHolders) {
-            for(PagePart placeHolder : this.placeHolders){
-                if(placeHolder.getPage() == part.getPage()){
+            for (PagePart placeHolder : this.placeHolders) {
+                if (placeHolder.getPage() == part.getPage()) {
                     return;
                 }
             }
@@ -177,7 +177,7 @@ class CacheManager {
         }
     }
 
-    public List<PagePart> getPlaceHolders(){
+    public List<PagePart> getPlaceHolders() {
         synchronized (placeHolders) {
             return placeHolders;
         }
