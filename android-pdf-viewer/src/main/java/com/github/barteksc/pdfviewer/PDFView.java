@@ -763,8 +763,8 @@ public class PDFView extends RelativeLayout {
         // Draws thumbnails
         //int j = 0;
         for (PagePart part : cacheManager.getThumbnails()) {
+            //Log.d("XX","getPage = " + part.getPage());
             drawPart(canvas, part);
-            //j++;
         }
 
         // Draws parts
@@ -772,7 +772,6 @@ public class PDFView extends RelativeLayout {
         //int i = 0;
         for (PagePart part : cacheManager.getPageParts()) {
             drawPart(canvas, part);
-            //i++;
             if (callbacks.getOnDrawAll() != null
                     && !onDrawPagesNums.contains(part.getPage())) {
                 onDrawPagesNums.add(part.getPage());

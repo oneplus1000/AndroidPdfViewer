@@ -132,15 +132,22 @@ class PagesLoader {
         int firstPage = 0; //pdfView.pdfFile.getPageAtOffset(offsetFirst, pdfView.getZoom());
         int lastPage = 0;//pdfView.pdfFile.getPageAtOffset(offsetLast, pdfView.getZoom());
         if (pdfView.pdfFile.getRealDisplayDualPageType() == PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
-            int[] pages = pdfView.pdfFile.getPageAtOffsetForDualPage(offsetFirst, offsetLast, pdfView.getZoom());
-            firstPage = pages[0];
-            lastPage = pages[1];
+            int[] pagesStart = pdfView.pdfFile.getPageAtOffsetForDualPage(offsetFirst, pdfView.getZoom());
+            int[] pagesEnd = pdfView.pdfFile.getPageAtOffsetForDualPage(offsetLast, pdfView.getZoom());
+            firstPage = pagesStart[0];
+            lastPage = pagesStart[1];
+            if (lastPage < pagesEnd[0]) {
+                lastPage = pagesEnd[0];
+            }
+            if (lastPage < pagesEnd[1]) {
+                lastPage = pagesEnd[1];
+            }
         } else {
             firstPage = pdfView.pdfFile.getPageAtOffset(offsetFirst, pdfView.getZoom());
             lastPage = pdfView.pdfFile.getPageAtOffset(offsetLast, pdfView.getZoom());
         }
         //int pageCount = lastPage - firstPage + 1;
-        //Log.d("XX", "firstPage :" + firstPage + " lastPage:" + lastPage + "  offsetFirst:" + offsetFirst + " offsetLast:" + offsetLast);
+        Log.d("XX", "firstPage :" + firstPage + " lastPage:" + lastPage + "  offsetFirst:" + offsetFirst + " offsetLast:" + offsetLast);
 
 
         List<RenderRange> renderRanges = new LinkedList<>();
@@ -246,12 +253,12 @@ class PagesLoader {
 
         List<RenderRange> rangeList = getRenderRangeList(firstXOffset, firstYOffset, lastXOffset, lastYOffset);
 
-        //String debug = "rangeList: ";
+        String debug = "rangeList: ";
         for (RenderRange range : rangeList) {
             loadThumbnail(range.page);
-            //debug = debug + " " + range.page;
+            debug = debug + " " + range.page;
         }
-        //Log.d("XX", debug);
+        Log.d("XX", " >> " + debug);
 
         for (RenderRange range : rangeList) {
             calculatePartSize(range.gridSize);

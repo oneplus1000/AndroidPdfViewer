@@ -484,7 +484,7 @@ public class PdfFile {
     }
 
     //return int[2]  โดย {firstPage,lastPage,}
-    public int[] getPageAtOffsetForDualPage(float offsetFirst, float offsetLast, float zoom) {
+    public int[] getPageAtOffsetForDualPage(float offsetFirst, float zoom) {
 
         int count = this.dualPageDisplays.size();
         float viewWidth = this.viewSize.getWidth() * zoom;
@@ -514,6 +514,8 @@ public class PdfFile {
         if (selected + 1 < count) {
             int next = selected + 1;
             displayEnd = this.dualPageDisplays.get(next);
+        } else {
+            displayEnd = this.dualPageDisplays.get(selected);
         }
 
         int firstPage = displayStart.getPageLeft();
@@ -527,38 +529,11 @@ public class PdfFile {
 
         if (displayEnd != null) {
             lastPage = displayEnd.getPageRight();
-            if (lastPage == -1) {
+            if (lastPage < displayEnd.getPageLeft()) {
                 lastPage = displayEnd.getPageLeft();
             }
         }
-
-
-
-
-
-        /*
-        DualPageDisplay display = this.dualPageDisplays.get(selected);
-        int firstPage = display.getPageLeft();
-        int lastPage = display.getPageRight();
-        if (selected - 1 >= 0) {
-            int prev = selected - 1;
-            DualPageDisplay displayPrev = this.dualPageDisplays.get(prev);
-            if (displayPrev.getPageLeft() != -1) {
-                firstPage = displayPrev.getPageLeft();
-            } else if (displayPrev.getPageRight() != -1) {
-                firstPage = displayPrev.getPageRight();
-            }
-        }
-        if (selected + 1 < count) {
-            int next = selected + 1;
-            DualPageDisplay displayNext = this.dualPageDisplays.get(next);
-            if (displayNext.getPageRight() != -1) {
-                lastPage = displayNext.getPageRight();
-            } else if (displayNext.getPageLeft() != -1) {
-                lastPage = displayNext.getPageLeft();
-            }
-        }*/
-
+        
         return new int[]{firstPage, lastPage};
     }
 
