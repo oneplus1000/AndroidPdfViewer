@@ -215,22 +215,26 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
         scrolling = true;
+
         if (pdfView.isZooming() || pdfView.isSwipeEnabled()) {
             pdfView.moveRelativeTo(-distanceX, -distanceY);
         }
         if (!scaling || pdfView.doRenderDuringScale()) {
             pdfView.loadPageByOffset();
         }
-        //Log.d("XX1","getCurrentXOffset="+pdfView.getCurrentXOffset());
+        Log.d("XX","getCurrentXOffset="+pdfView.getCurrentXOffset());
         return true;
     }
 
     private void onScrollEnd(MotionEvent event) {
         pdfView.loadPages();
         hideHandle();
+        /*
         if (!animationManager.isFlinging()) {
             pdfView.performPageSnap();
         }
+
+         */
     }
 
     @Override
@@ -290,8 +294,8 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
             maxX = pageStart;
             maxY = 0;
         }
-
-        animationManager.startFlingAnimation(xOffset, yOffset, (int) (velocityX), (int) (velocityY),
+        //Log.d("XX","sdsdsdsdsd");
+       animationManager.startFlingAnimation(xOffset, yOffset, (int) (velocityX), (int) (velocityY),
                 (int) minX, (int) maxX, (int) minY, (int) maxY);
     }
 
@@ -326,6 +330,7 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
+
         if (!enabled) {
             return false;
         }

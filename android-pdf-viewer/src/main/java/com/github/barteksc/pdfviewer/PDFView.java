@@ -303,13 +303,15 @@ public class PDFView extends RelativeLayout {
     private int requestDisplayDualPageType = Configurator.REQUEST_DISPLAY_DUALPAGE_TYPE_ONLY_SINGLE_PAGE;
 
     private ArrayList<Integer> pageBreaks;
-    public void setPageBreaks(ArrayList<Integer> pageBreaks){
+
+    public void setPageBreaks(ArrayList<Integer> pageBreaks) {
         this.pageBreaks = pageBreaks;
     }
 
-    public ArrayList<Integer> getPageBreaks(){
+    public ArrayList<Integer> getPageBreaks() {
         return this.pageBreaks;
     }
+
     /**
      * Construct the initial view
      */
@@ -326,7 +328,6 @@ public class PDFView extends RelativeLayout {
     public void setRequestDisplayDualPageType(int pageType) {
         this.requestDisplayDualPageType = pageType;
     }
-
 
 
     /**
@@ -1259,6 +1260,34 @@ public class PDFView extends RelativeLayout {
      * @return true if single page fills the entire screen in the scrolling direction
      */
     public boolean pageFillsScreen() {
+        if (this.getRealDisplayDualPageType() == Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
+            List<DualPageDisplay> displays = this.pdfFile.getDualPageDisplays();
+            if (currentPage >= displays.size()) {
+                return false;
+            }
+            DualPageDisplay display = displays.get(currentPage);
+            int startIndex = -1;
+            int endIndex = -1;
+            if (display.getPageLeft() != -1) {
+                startIndex = display.getPageLeft();
+                endIndex = display.getPageLeft();
+            }
+            if (display.getPageRight() != -1) {
+                if (startIndex == -1) {
+                    startIndex = display.getPageRight();
+                }
+                endIndex = display.getPageRight();
+            }
+
+            float start = -pdfFile.getPageOffsetForDual(startIndex, zoom);
+            float startOf2nd = -pdfFile.getPageOffsetForDual(endIndex, zoom);
+            float endOf2nd = startOf2nd - pdfFile.getPageLength(endIndex, zoom);
+            //float startB = -pdfFile.getPageOffset(currentPage, zoom);
+            Log.d("XX", "A = " + start + "  endOf2nd:"+endOf2nd + "  " + (start > currentXOffset && endOf2nd < currentXOffset - getWidth()));
+            //return start > currentXOffset && endOf2nd < currentXOffset - getWidth();
+            return true; //FAKE
+        }
+        //หน้าเดี่ยว
         float start = -pdfFile.getPageOffset(currentPage, zoom);
         float end = start - pdfFile.getPageLength(currentPage, zoom);
         if (isSwipeVertical()) {
@@ -1836,7 +1865,7 @@ public class PDFView extends RelativeLayout {
             return this;
         }
 
-        public Configurator setPageBreaks(ArrayList<Integer> pageBreaks){
+        public Configurator setPageBreaks(ArrayList<Integer> pageBreaks) {
             this.pageBreaks = pageBreaks;
             return this;
         }

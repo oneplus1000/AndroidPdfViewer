@@ -381,6 +381,11 @@ public class PdfFile {
                 offset += size + spacingPx;
             }
         }
+
+        //DEBUG
+        for (float f : pageOffsets) {
+            Log.d("XX", " f=" + f);
+        }
     }
 
     public float getDocLen(float zoom) {
@@ -412,7 +417,7 @@ public class PdfFile {
 
         //offset สำหรับหน้าคู่
         if (this.viewSize != null && this.realDisplayDualPageType == PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
-            int index = DualPageDisplay.findIndexByPage(this.dualPageDisplays, pageIndex);
+            /*int index = DualPageDisplay.findIndexByPage(this.dualPageDisplays, pageIndex);
             if (index != -1) {
                 DualPageDisplay display = this.dualPageDisplays.get(index);
 
@@ -432,6 +437,10 @@ public class PdfFile {
                     return (offsetBefore + (this.viewSize.getWidth() / 2f)) * zoom;
                 }
 
+            }*/
+            Float result = _getPageOffsetForDual(pageIndex, zoom);
+            if (result != null) {
+                return result;
             }
         }
 
@@ -466,6 +475,39 @@ public class PdfFile {
         }
         return pageOffsets.get(pageIndex) * zoom;
     }
+
+    public float getPageOffsetForDual(int pageIndex, float zoom) {
+        Float result = _getPageOffsetForDual(pageIndex, zoom);
+        if (result != null) {
+            return result;
+        }
+        return 0.0f;
+    }
+
+    private Float _getPageOffsetForDual(int pageIndex, float zoom) {
+        int index = DualPageDisplay.findIndexByPage(this.dualPageDisplays, pageIndex);
+        if (index != -1) {
+            DualPageDisplay display = this.dualPageDisplays.get(index);
+            //float offsetBefore = 0f;
+            float offsetBefore = this.viewSize.getWidth() * (index);
+            if (display.getPageLeft() == pageIndex) {
+                float offset = this.pageSizes.get(pageIndex).getWidth();
+                if (display.getPageRight() == -1) {  //ถ้าไม่มีหน้าคู่มันจะต้องอยู่ตรงกลาง
+                    return (offsetBefore + (this.viewSize.getWidth() / 2f) - (offset / 2)) * zoom;
+                }
+                return (offsetBefore + (this.viewSize.getWidth() / 2f) - offset) * zoom;
+            } else if (display.getPageRight() == pageIndex) {
+                if (display.getPageLeft() == -1) {//ถ้าไม่มีหน้าคู่มันจะต้องอยู่ตรงกลาง
+                    float offset = this.pageSizes.get(pageIndex).getWidth();
+                    return (offsetBefore + (this.viewSize.getWidth() / 2f) - (offset / 2)) * zoom;
+                }
+                return (offsetBefore + (this.viewSize.getWidth() / 2f)) * zoom;
+            }
+
+        }
+        return null;
+    }
+
 
     /**
      * Get secondary page offset, that is X for vertical scroll and Y for horizontal scroll
