@@ -399,6 +399,23 @@ public class PdfFile {
      * Get the page's height if swiping vertical, or width if swiping horizontal.
      */
     public float getPageLength(int pageIndex, float zoom) {
+        if (this.viewSize != null && this.realDisplayDualPageType == PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
+            //pageIndex สำหรับ REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE จะคือ หน้าที่แสดง ไม่ใช่หน้าจริงของ PDF
+            if (pageIndex >= dualPageDisplays.size()) {
+                return 0;
+            }
+            DualPageDisplay display = dualPageDisplays.get(pageIndex);
+            float len = 0.0f;
+            if (display.getPageLeft() != -1) {
+                SizeF size = getPageSize(display.getPageLeft());
+                len += size.getWidth();
+            }
+            if (display.getPageRight() != -1) {
+                SizeF size = getPageSize(display.getPageLeft());
+                len += size.getWidth();
+            }
+            return len * zoom;
+        }
         SizeF size = getPageSize(pageIndex);
         return (isVertical ? size.getHeight() : size.getWidth()) * zoom;
     }
@@ -435,7 +452,7 @@ public class PdfFile {
             }
         }
 
-        return getPageOffset(pageIndex, zoom);
+        return getPageOffset(pageIndex, zoom,true);
     }
 
     public Float snapOffsetForPage(int pageIndex, SnapEdge edge) {
@@ -456,10 +473,71 @@ public class PdfFile {
         return (float) this.viewSize.getWidth() * index;
     }
 
+
     /**
      * Get primary page offset, that is Y for vertical scroll and X for horizontal scroll
      */
-    public float getPageOffset(int pageIndex, float zoom) {
+    public float getPageOffset(int pageIndex, float zoom, boolean isPageIndex) {
+
+        if (this.viewSize != null && this.realDisplayDualPageType == PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
+            //pageIndex สำหรับ REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE จะคือ หน้าที่แสดง ไม่ใช่หน้าจริงของ PDF
+            //แต่ถ้า isPageIndex == true มันคือหน้าจริงของ PDF
+            int selectedIndex = -1;
+            int countPage = 0;
+            if (isPageIndex) {
+                selectedIndex = pageIndex;
+                int dualPageDisplayIndex = DualPageDisplay.findIndexByPage(dualPageDisplays, pageIndex);
+                if (dualPageDisplayIndex == -1) {
+                    return 0;
+                }
+                DualPageDisplay display = dualPageDisplays.get(dualPageDisplayIndex);
+                if (display.getPageLeft() != -1) {
+                    countPage++;
+                }
+                if (display.getPageRight() != -1) {
+                    countPage++;
+                }
+
+                float offsetBefore = this.viewSize.getWidth() * (dualPageDisplayIndex);
+                float width = this.pageSizes.get(selectedIndex).getWidth();
+                if (countPage == 1) {
+                    return (offsetBefore + (this.viewSize.getWidth() / 2f) - (width / 2)) * zoom;
+                } else if (countPage == 2) {
+                    if (display.getPageLeft() == pageIndex) {
+                        return (offsetBefore + (this.viewSize.getWidth() / 2f) - width) * zoom;
+                    } else if (display.getPageRight() == pageIndex) {
+                        return (offsetBefore + (this.viewSize.getWidth() / 2f)) * zoom;
+                    }
+                }
+            } else {
+                if (pageIndex >= dualPageDisplays.size()) {
+                    return 0;
+                }
+                DualPageDisplay display = dualPageDisplays.get(pageIndex);
+                if (display.getPageLeft() != -1) {
+                    selectedIndex = display.getPageLeft();
+                    countPage++;
+                }
+                if (display.getPageRight() != -1) {
+                    if (selectedIndex == -1) {
+                        selectedIndex = display.getPageRight();
+                    }
+                    countPage++;
+                }
+                if (selectedIndex == -1 || countPage <= 0) {
+                    return 0;
+                }
+                float offsetBefore = this.viewSize.getWidth() * (pageIndex);
+                float width = this.pageSizes.get(selectedIndex).getWidth();
+                if (countPage == 1) {  //ถ้าไม่มีหน้าคู่มันจะต้องอยู่ตรงกลาง
+                    return (offsetBefore + (this.viewSize.getWidth() / 2f) - (width / 2)) * zoom;
+                } else if (countPage == 2) {
+                    return (offsetBefore + (this.viewSize.getWidth() / 2f) - width) * zoom;
+                }
+            }
+            return 0;
+        }
+
         int docPage = documentPage(pageIndex);
         if (docPage < 0) {
             return 0;

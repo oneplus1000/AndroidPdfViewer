@@ -23,6 +23,7 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 
+import com.github.barteksc.pdfviewer.model.DualPageDisplay;
 import com.github.barteksc.pdfviewer.model.LinkTapEvent;
 import com.github.barteksc.pdfviewer.scroll.ScrollHandle;
 import com.github.barteksc.pdfviewer.util.SnapEdge;
@@ -127,6 +128,7 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
         }
 
         //สำหรับหน้าคู่
+        /*
         if (this.pdfView.pdfFile.getRealDisplayDualPageType() == PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
             int direction = velocityX > 0 ? -1 : 1;
             float delta = ev.getX() - downEvent.getX();
@@ -144,9 +146,20 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
                 }
             }
             int targetPage = Math.max(0, Math.min(count - 1, selected + direction));
-            animationManager.startPageFlingAnimation(-targetPage * pageWidth);
+            DualPageDisplay display = pdfView.pdfFile.getDualPageDisplays().get(targetPage);
+            int index = -1;
+            if (display.getPageLeft() != -1) {
+                index = display.getPageLeft();
+            }
+            if (display.getPageRight() != -1 && index == -1) {
+                index = display.getPageRight();
+            }
+
+
+            Log.d("XX1", " -targetPage * pageWidth = " + (-targetPage * pageWidth));
+            //animationManager.startPageFlingAnimation(-targetPage * pageWidth);
             return;
-        }
+        }*/
 
         int direction;
         if (pdfView.isSwipeVertical()) {
@@ -159,10 +172,16 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
         float offsetX = pdfView.getCurrentXOffset() - delta * pdfView.getZoom();
         float offsetY = pdfView.getCurrentYOffset() - delta * pdfView.getZoom();
         int startingPage = pdfView.findFocusPage(offsetX, offsetY);
-        int targetPage = Math.max(0, Math.min(pdfView.getPageCount() - 1, startingPage + direction));
 
+        int targetPage = 0;
+        if (this.pdfView.getRealDisplayDualPageType() == PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
+            targetPage = Math.max(0, Math.min(pdfView.pdfFile.getDualPageDisplays().size() - 1, startingPage + direction));
+        } else {
+            targetPage = Math.max(0, Math.min(pdfView.getPageCount() - 1, startingPage + direction));
+        }
         SnapEdge edge = pdfView.findSnapEdge(targetPage);
         float offset = pdfView.snapOffsetForPage(targetPage, edge);
+        Log.d("XX1", " startingPage:" + startingPage + " targetPage:" + targetPage + "  edge:" + edge + " offset:" + offset);
         animationManager.startPageFlingAnimation(-offset);
     }
 
@@ -221,7 +240,7 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
         if (!scaling || pdfView.doRenderDuringScale()) {
             pdfView.loadPageByOffset();
         }
-        //Log.d("XX1","getCurrentXOffset="+pdfView.getCurrentXOffset());
+        Log.d("XX", "getCurrentXOffset=" + pdfView.getCurrentXOffset());
         return true;
     }
 
@@ -276,7 +295,7 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
 
         PdfFile pdfFile = pdfView.pdfFile;
 
-        float pageStart = -pdfFile.getPageOffset(pdfView.getCurrentPage(), pdfView.getZoom());
+        float pageStart = -pdfFile.getPageOffset(pdfView.getCurrentPage(), pdfView.getZoom(), false);
         float pageEnd = pageStart - pdfFile.getPageLength(pdfView.getCurrentPage(), pdfView.getZoom());
         float minX, minY, maxX, maxY;
         if (pdfView.isSwipeVertical()) {

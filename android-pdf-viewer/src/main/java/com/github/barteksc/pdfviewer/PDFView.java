@@ -406,7 +406,7 @@ public class PDFView extends RelativeLayout {
         }
         //Log.d("YYY","Z page->"+page);
         page = pdfFile.determineValidPageNumberFrom(page);
-        float offset = page == 0 ? 0 : -pdfFile.getPageOffset(page, zoom);
+        float offset = page == 0 ? 0 : -pdfFile.getPageOffset(page, zoom,false);
         offset += pdfFile.getPageSpacing(page, getZoom()) / 2f;
         if (swipeVertical) {
             if (withAnimation) {
@@ -441,7 +441,7 @@ public class PDFView extends RelativeLayout {
 
         loadPages();
 
-        Log.d("XX", "currentPage: " + currentPage);
+        //Log.d("XX", "currentPage: " + currentPage);
         if (scrollHandle != null && !documentFitsView()) {
             scrollHandle.setPageNum(currentPage + 1);
         }
@@ -795,10 +795,10 @@ public class PDFView extends RelativeLayout {
             float translateX, translateY;
             if (swipeVertical) {
                 translateX = 0;
-                translateY = pdfFile.getPageOffset(page, zoom);
+                translateY = pdfFile.getPageOffset(page, zoom,false);
             } else {
                 translateY = 0;
-                translateX = pdfFile.getPageOffset(page, zoom);
+                translateX = pdfFile.getPageOffset(page, zoom,false);
             }
 
             canvas.translate(translateX, translateY);
@@ -827,7 +827,7 @@ public class PDFView extends RelativeLayout {
         SizeF size = pdfFile.getPageSize(part.getPage());
 
         if (swipeVertical) {
-            localTranslationY = pdfFile.getPageOffset(part.getPage(), zoom);
+            localTranslationY = pdfFile.getPageOffset(part.getPage(), zoom,false);
             float maxWidth = pdfFile.getMaxPageWidth();
             localTranslationX = toCurrentScale(maxWidth - size.getWidth()) / 2;
         } else {
@@ -898,7 +898,7 @@ public class PDFView extends RelativeLayout {
         SizeF size = pdfFile.getPageSize(part.getPage());
 
         if (swipeVertical) {
-            localTranslationY = pdfFile.getPageOffset(part.getPage(), zoom);
+            localTranslationY = pdfFile.getPageOffset(part.getPage(), zoom,false);
             float maxWidth = pdfFile.getMaxPageWidth();
             localTranslationX = toCurrentScale(maxWidth - size.getWidth()) / 2;
         } else {
@@ -1198,7 +1198,7 @@ public class PDFView extends RelativeLayout {
             return SnapEdge.NONE;
         }
         float currentOffset = swipeVertical ? currentYOffset : currentXOffset;
-        float offset = -pdfFile.getPageOffset(page, zoom);
+        float offset = -pdfFile.getPageOffset(page, zoom,false);
         int length = swipeVertical ? getHeight() : getWidth();
         float pageLength = pdfFile.getPageLength(page, zoom);
 
@@ -1229,7 +1229,8 @@ public class PDFView extends RelativeLayout {
         //}
 
 
-        float offset = pdfFile.getPageOffset(pageIndex, zoom);
+        float offset = pdfFile.getPageOffset(pageIndex, zoom,false);
+        Log.d("XX1"," pageIndex "+ pageIndex +" offset = "+offset);
         float length = swipeVertical ? getHeight() : getWidth();
         float pageLength = pdfFile.getPageLength(pageIndex, zoom);
 
@@ -1259,8 +1260,9 @@ public class PDFView extends RelativeLayout {
      * @return true if single page fills the entire screen in the scrolling direction
      */
     public boolean pageFillsScreen() {
-        float start = -pdfFile.getPageOffset(currentPage, zoom);
+        float start = -pdfFile.getPageOffset(currentPage, zoom,false);
         float end = start - pdfFile.getPageLength(currentPage, zoom);
+        Log.d("XX1",""+(start) + " >  " +currentXOffset + " && " + end + " < " + ( currentXOffset - getWidth()) + "  ---> " +  (start > currentXOffset && end < currentXOffset - getWidth() )  );
         if (isSwipeVertical()) {
             return start > currentYOffset && end < currentYOffset - getHeight();
         } else {
