@@ -268,10 +268,11 @@ public class PdfFile {
             }
         }
 
-
+        /*
         for (DualPageDisplay d : dualPageDisplays) {
             Log.d("XX", "KK " + d.debug());
         }
+        */
     }
 
     public int getPagesCount() {
