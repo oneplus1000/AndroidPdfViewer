@@ -453,7 +453,7 @@ public class PdfFile {
             }
         }
 
-        return getPageOffset(pageIndex, zoom,true);
+        return getPageOffset(pageIndex, zoom, true);
     }
 
     public Float snapOffsetForPage(int pageIndex, SnapEdge edge) {

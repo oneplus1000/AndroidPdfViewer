@@ -413,7 +413,7 @@ public class PDFView extends RelativeLayout {
             float space = (this.getWidth() - pdfFile.getPageLength(page,getZoom()))/ 2;
             if( space > 0 ) {
                 offset += space;
-            } 
+            }
         } else {
             offset += pdfFile.getPageSpacing(page, getZoom()) / 2f;
         }
