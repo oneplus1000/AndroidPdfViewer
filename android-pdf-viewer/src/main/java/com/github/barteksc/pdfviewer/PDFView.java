@@ -408,16 +408,19 @@ public class PDFView extends RelativeLayout {
         //Log.d("YYY","Z page->"+page);
         page = pdfFile.determineValidPageNumberFrom(page);
         float offset = page == 0 ? 0 : -pdfFile.getPageOffset(page, zoom, false);
-        Log.d("XX1", "offset = " + offset);
+        //offset += pdfFile.getPageSpacing(page, getZoom()) / 2f;
+        Log.d("XX1", "M1 offset = " + offset);
         if (this.pdfFile.getRealDisplayDualPageType() == Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
-            float space = (this.getWidth() - pdfFile.getPageLength(page,getZoom()))/ 2;
-            if( space > 0 ) {
+            //DualPageDisplay display = pdfFile.getDualPageDisplays().get(page);
+            float space = (this.getWidth() - pdfFile.getPageLength(page, getZoom())) / 2;
+            Log.d("XX1", "M2 offset = " + offset + " space:"+space );
+            if (space > 0) {
                 offset += space;
             }
         } else {
             offset += pdfFile.getPageSpacing(page, getZoom()) / 2f;
         }
-        Log.d("XX1", "B offset = " + offset + " page =" + page );
+        Log.d("XX1", "M3 offset = " + offset + " page =" + page);
         if (swipeVertical) {
             if (withAnimation) {
                 animationManager.startYAnimation(currentYOffset, offset);

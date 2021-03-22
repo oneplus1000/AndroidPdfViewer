@@ -12,6 +12,15 @@ public class DualPageDisplay {
         this.pageRight = pageRight;
     }
 
+    public int countPage(){
+        if(this.pageRight == -1 && this.pageLeft == -1){
+            return 0;
+        }else if( this.pageRight == -1 || this.pageLeft == -1 ){
+            return 1;
+        }
+        return 2;
+    }
+
     public int getPageLeft() {
         return this.pageLeft;
     }
