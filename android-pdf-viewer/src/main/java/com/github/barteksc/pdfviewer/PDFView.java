@@ -409,18 +409,18 @@ public class PDFView extends RelativeLayout {
         page = pdfFile.determineValidPageNumberFrom(page);
         float offset = page == 0 ? 0 : -pdfFile.getPageOffset(page, zoom, false);
         //offset += pdfFile.getPageSpacing(page, getZoom()) / 2f;
-        Log.d("XX1", "M1 offset = " + offset);
+        //Log.d("XX1", "M1 offset = " + offset);
         if (this.pdfFile.getRealDisplayDualPageType() == Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
             //DualPageDisplay display = pdfFile.getDualPageDisplays().get(page);
             float space = (this.getWidth() - pdfFile.getPageLength(page, getZoom())) / 2;
-            Log.d("XX1", "M2 offset = " + offset + " space:"+space );
+            //Log.d("XX1", "M2 offset = " + offset + " space:"+space );
             if (space > 0) {
                 offset += space;
             }
         } else {
             offset += pdfFile.getPageSpacing(page, getZoom()) / 2f;
         }
-        Log.d("XX1", "M3 offset = " + offset + " page =" + page);
+        //Log.d("XX1", "M3 offset = " + offset + " page =" + page);
         if (swipeVertical) {
             if (withAnimation) {
                 animationManager.startYAnimation(currentYOffset, offset);
@@ -767,7 +767,7 @@ public class PDFView extends RelativeLayout {
         // Moves the canvas before drawing any element
         float currentXOffset = this.currentXOffset;
         float currentYOffset = this.currentYOffset;
-        Log.d("XX", "---- currentXOffset:" + currentXOffset);
+        //Log.d("XX", "---- currentXOffset:" + currentXOffset);
         canvas.translate(currentXOffset, currentYOffset);
 
         for (PagePart part : cacheManager.getPlaceHolders()) {
@@ -991,11 +991,11 @@ public class PDFView extends RelativeLayout {
      */
     void loadComplete(PdfFile pdfFile) {
 
-        Log.d("XX1","D1 this.defaultPage =" + this.defaultPage);
+        //Log.d("XX1","D1 this.defaultPage =" + this.defaultPage);
         if (pdfFile.getRealDisplayDualPageType() == Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
             //เนื่องจาก this.defaultPage เริ่มต้นมาจะเป็นของแบบหน้าเดี่ยวๆเสมอ ถ้าเปิดมาเป็นหน้าคู่เราจะปรับให้้ไปตามจุดจริงตามแบบหน้าคู่
             this.defaultPage = DualPageDisplay.findIndexByPage(pdfFile.getDualPageDisplays(), this.defaultPage);
-            Log.d("XX1","D2 this.defaultPage =" + this.defaultPage);
+            //Log.d("XX1","D2 this.defaultPage =" + this.defaultPage);
         }
 
         state = State.LOADED;
@@ -1080,7 +1080,7 @@ public class PDFView extends RelativeLayout {
      */
     public void moveTo(float offsetX, float offsetY, boolean moveHandle) {
         if (swipeVertical) {
-            Log.d("XX", "M offsetX " + offsetX);
+            //Log.d("XX", "M offsetX " + offsetX);
             // Check X offset
             float scaledPageWidth = toCurrentScale(pdfFile.getMaxPageWidth());
             if (scaledPageWidth < getWidth()) {
@@ -1113,7 +1113,7 @@ public class PDFView extends RelativeLayout {
                 scrollDir = ScrollDir.NONE;
             }
         } else {
-            Log.d("XX", "N offsetX " + offsetX);
+            //Log.d("XX", "N offsetX " + offsetX);
             // Check Y offset
             float h = pdfFile.getMaxPageHeight(currentPageJumpTo);
             float scaledPageHeight = toCurrentScale(h);
@@ -1132,14 +1132,14 @@ public class PDFView extends RelativeLayout {
             float contentWidth = pdfFile.getDocLen(zoom);
             if (contentWidth < getWidth()) { // whole document width visible on screen
                 offsetX = (getWidth() - contentWidth) / 2;
-                Log.d("XX", "A offsetX " + offsetX);
+               // Log.d("XX", "A offsetX " + offsetX);
             } else {
                 if (offsetX > 0) { // left visible
                     offsetX = 0;
-                    Log.d("XX", "B offsetX " + offsetX);
+                    //Log.d("XX", "B offsetX " + offsetX);
                 } else if (offsetX + contentWidth < getWidth()) { // right visible
                     offsetX = -contentWidth + getWidth();
-                    Log.d("XX", "C offsetX " + offsetX);
+                    //Log.d("XX", "C offsetX " + offsetX);
                 }
             }
 
@@ -1151,7 +1151,7 @@ public class PDFView extends RelativeLayout {
                 scrollDir = ScrollDir.NONE;
             }
         }
-        Log.d("XX", "offsetX " + offsetX);
+        //Log.d("XX", "offsetX " + offsetX);
         currentXOffset = offsetX;
         currentYOffset = offsetY;
         float positionOffset = getPositionOffset();
@@ -1249,7 +1249,7 @@ public class PDFView extends RelativeLayout {
 
 
         float offset = pdfFile.getPageOffset(pageIndex, zoom, false);
-        Log.d("XX1", " pageIndex " + pageIndex + " offset = " + offset);
+        //Log.d("XX1", " pageIndex " + pageIndex + " offset = " + offset);
         float length = swipeVertical ? getHeight() : getWidth();
         float pageLength = pdfFile.getPageLength(pageIndex, zoom);
 
@@ -1886,7 +1886,7 @@ public class PDFView extends RelativeLayout {
             PDFView.this.setSwipeEnabled(enableSwipe);
             PDFView.this.setNightMode(nightMode);
             PDFView.this.enableDoubletap(enableDoubletap);
-            Log.d("XX1","DDD defaultPage:"+defaultPage);
+            //Log.d("XX1","DDD defaultPage:"+defaultPage);
             PDFView.this.setDefaultPage(defaultPage);
             PDFView.this.setSwipeVertical(!swipeHorizontal);
             PDFView.this.enableAnnotationRendering(annotationRendering);

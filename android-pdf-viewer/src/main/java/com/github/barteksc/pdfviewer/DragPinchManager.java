@@ -181,7 +181,7 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
         }
         SnapEdge edge = pdfView.findSnapEdge(targetPage);
         float offset = pdfView.snapOffsetForPage(targetPage, edge);
-        Log.d("XX1", " startingPage:" + startingPage + " targetPage:" + targetPage + "  edge:" + edge + " offset:" + offset);
+        //Log.d("XX1", " startingPage:" + startingPage + " targetPage:" + targetPage + "  edge:" + edge + " offset:" + offset);
         animationManager.startPageFlingAnimation(-offset);
     }
 
@@ -240,7 +240,7 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
         if (!scaling || pdfView.doRenderDuringScale()) {
             pdfView.loadPageByOffset();
         }
-        Log.d("XX", "getCurrentXOffset=" + pdfView.getCurrentXOffset());
+        //Log.d("XX", "getCurrentXOffset=" + pdfView.getCurrentXOffset());
         return true;
     }
 

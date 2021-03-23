@@ -529,7 +529,7 @@ public class PdfFile {
                 float offsetBefore = this.viewSize.getWidth() * (pageIndex);
                 float width = this.pageSizes.get(selectedIndex).getWidth();
                 if (countPage == 1) {  //ถ้าไม่มีหน้าคู่มันจะต้องอยู่ตรงกลาง
-                    Log.d("XX1","------ pageIndex: "+pageIndex+" countPage = "+countPage + " offsetBefore:"+ offsetBefore + " width:"+width+ "    => " + ((offsetBefore + (this.viewSize.getWidth() / 2f) - (width / 2)) * zoom));
+                    //Log.d("XX1","------ pageIndex: "+pageIndex+" countPage = "+countPage + " offsetBefore:"+ offsetBefore + " width:"+width+ "    => " + ((offsetBefore + (this.viewSize.getWidth() / 2f) - (width / 2)) * zoom));
                     return (offsetBefore + (this.viewSize.getWidth() / 2f) - (width / 2)) * zoom;
                 } else if (countPage == 2) {
                     return (offsetBefore + (this.viewSize.getWidth() / 2f) - width) * zoom;
