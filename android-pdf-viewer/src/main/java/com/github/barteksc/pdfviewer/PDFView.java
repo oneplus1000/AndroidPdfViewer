@@ -991,10 +991,11 @@ public class PDFView extends RelativeLayout {
      */
     void loadComplete(PdfFile pdfFile) {
 
-
+        Log.d("XX1","D1 this.defaultPage =" + this.defaultPage);
         if (pdfFile.getRealDisplayDualPageType() == Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
             //เนื่องจาก this.defaultPage เริ่มต้นมาจะเป็นของแบบหน้าเดี่ยวๆเสมอ ถ้าเปิดมาเป็นหน้าคู่เราจะปรับให้้ไปตามจุดจริงตามแบบหน้าคู่
             this.defaultPage = DualPageDisplay.findIndexByPage(pdfFile.getDualPageDisplays(), this.defaultPage);
+            Log.d("XX1","D2 this.defaultPage =" + this.defaultPage);
         }
 
         state = State.LOADED;
@@ -1885,6 +1886,7 @@ public class PDFView extends RelativeLayout {
             PDFView.this.setSwipeEnabled(enableSwipe);
             PDFView.this.setNightMode(nightMode);
             PDFView.this.enableDoubletap(enableDoubletap);
+            Log.d("XX1","DDD defaultPage:"+defaultPage);
             PDFView.this.setDefaultPage(defaultPage);
             PDFView.this.setSwipeVertical(!swipeHorizontal);
             PDFView.this.enableAnnotationRendering(annotationRendering);
