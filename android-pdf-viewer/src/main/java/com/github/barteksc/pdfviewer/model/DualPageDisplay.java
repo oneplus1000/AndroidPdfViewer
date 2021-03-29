@@ -12,10 +12,10 @@ public class DualPageDisplay {
         this.pageRight = pageRight;
     }
 
-    public int countPage(){
-        if(this.pageRight == -1 && this.pageLeft == -1){
+    public int countPage() {
+        if (this.pageRight == -1 && this.pageLeft == -1) {
             return 0;
-        }else if( this.pageRight == -1 || this.pageLeft == -1 ){
+        } else if (this.pageRight == -1 || this.pageLeft == -1) {
             return 1;
         }
         return 2;
@@ -27,6 +27,14 @@ public class DualPageDisplay {
 
     public int getPageRight() {
         return this.pageRight;
+    }
+
+    public void setPageRight(int pageRight) {
+        this.pageRight = pageRight;
+    }
+
+    public void setPageLeft(int pageLeft) {
+        this.pageLeft = pageLeft;
     }
 
     //หา index ของ array โดยหาจาก pageLeftOrRight ซึ่งอาจจะเป็น pageLeft หรือ pageRight ก็ได้

@@ -158,6 +158,7 @@ public class PdfFile {
             if (pageSize.getHeight() > originalMaxHeightPageSize.getHeight()) {
                 originalMaxHeightPageSize = pageSize;
             }
+            //Log.d("XX1", " " + i + "  " + pageSize.getWidth());
             originalPageSizes.add(pageSize);
         }
 
@@ -177,6 +178,12 @@ public class PdfFile {
         maxWidthPageSize = calculator.getOptimalMaxWidthPageSize();
         maxHeightPageSize = calculator.getOptimalMaxHeightPageSize();
 
+        for (Size size : originalPageSizes) {
+            SizeF pageSize = calculator.calculate(size);
+            this.pageSizes.add(pageSize);
+        }
+
+        /* คำนวนแบบเก่า
         int viewSizeHalfWidth = viewSize.getWidth() / 2;
         int realDisplayDualPage = PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SINGLE_PAGE;
 
@@ -186,6 +193,7 @@ public class PdfFile {
         if (maybeCanDisplayDualPage) {
             realDisplayDualPage = PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE;
         }
+
         for (Size size : originalPageSizes) {
             SizeF pageSize = calculator.calculate(size);
             pageSizes.add(pageSize);
@@ -196,13 +204,15 @@ public class PdfFile {
                 }
             }
         }
-
         this.realDisplayDualPageType = realDisplayDualPage;
-
         if (this.realDisplayDualPageType == PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE) {
             //คำนวนหน้าที่จะต้องติดกัน
             this.calcDualPages();
-        }
+        }*/
+        //คำนวนแบบใหม่
+        this.realDisplayDualPageType = this.calcDualPages(viewSize);
+
+
         if (autoSpacing) {
             prepareAutoSpacing(viewSize);
         }
@@ -216,7 +226,120 @@ public class PdfFile {
         return this.dualPageDisplays;
     }
 
+    private int calcDualPages(Size viewSize) {
+        this.dualPageDisplays.clear(); //ลบของเก่าออกให้หมด
+        int pageCount = this.getPagesCount();
+        List<Integer> breaks = this.pageBreaks;
+        boolean maybeCanDisplayDualPage = this.autoSpacing &&
+                !this.isVertical &&
+                this.requestDisplayDualPageType == PDFView.Configurator.REQUEST_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE_IF_IT_CAN;
+        if (!maybeCanDisplayDualPage) {
+            return PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SINGLE_PAGE; //หน้าเดี๋ยวแน่ๆ
+        }
+        if (viewSize.getWidth() < viewSize.getHeight()) {
+            return PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SINGLE_PAGE; //หน้าเดี๋ยวแน่ๆ
+        }
+        float halfOfView = viewSize.getWidth() / 2.0f;
+        PageSizeCalculator calculator = new PageSizeCalculator(pageFitPolicy, originalMaxWidthPageSize,
+                originalMaxHeightPageSize, viewSize, fitEachPage);
+        int realDisplayDualPage = PDFView.Configurator.REAL_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE;
+        if (isRTL) {
+            int i = pageCount - 1;
+            int dualIndex = 0;
+            boolean isRight = true;
+            while (i >= 0) {
+                boolean isBreak = false;
+                if (isRight) {
+                    if (breaks.contains(pageCount - i) || this.pageSizes.get(i).getWidth() > halfOfView) {
+                        isBreak = true;
+                    }
+                } else {
+                    if (breaks.contains(pageCount - i) || this.pageSizes.get(i).getWidth() > halfOfView) {
+                        dualIndex++;
+                    }
+                }
+
+                //add to dualPageDisplays
+                this.dualDisplaysAddNewEmptyItem(dualIndex);
+                if (isRight) {
+                    this.dualPageDisplays.get(dualIndex).setPageRight(i);
+                } else {
+                    this.dualPageDisplays.get(dualIndex).setPageLeft(i);
+                }
+
+                //คำนวนว่าจะต้องโดดหรือไม่โดดไป dualIndex ต่อไป
+                if (isBreak) {
+                    //มัน add ข้อมูลด้านขวาแล้วไป dual index ต่อไปเลย
+                    dualIndex++;
+                } else {
+                    if (isRight) {
+                        //เปลี่ยนไป add ที่อันขวา
+                        isRight = false;
+                    } else {
+                        //มัน add ข้อมูลด้านขวาแล้วไป dual index ต่อไปเลย
+                        isRight = true;
+                        dualIndex++;
+                    }
+                }
+
+                i--;
+            }
+            Collections.reverse(dualPageDisplays);
+        } else {
+
+            int i = 0;
+            int dualIndex = 0;
+            boolean isLeft = true;
+            while (i < pageCount) {
+                boolean isBreak = false;
+                if (isLeft) {
+                    if (breaks.contains(i + 1) || this.pageSizes.get(i).getWidth() > halfOfView) {
+                        isBreak = true;
+                    }
+                } else {
+                    if (breaks.contains(i + 1) || this.pageSizes.get(i).getWidth() > halfOfView) {
+                        dualIndex++;
+                    }
+                }
+                //add to dualPageDisplays
+                this.dualDisplaysAddNewEmptyItem(dualIndex);
+                if (isLeft) {
+                    this.dualPageDisplays.get(dualIndex).setPageLeft(i);
+                } else {
+                    this.dualPageDisplays.get(dualIndex).setPageRight(i);
+                }
+
+                //คำนวนว่าจะต้องโดดหรือไม่โดดไป dualIndex ต่อไป
+                if (isBreak) {
+                    //มัน add ข้อมูลด้านขวาแล้วไป dual index ต่อไปเลย
+                    dualIndex++;
+                } else {
+                    if (isLeft) {
+                        //เปลี่ยนไป add ที่อันขวา
+                        isLeft = false;
+                    } else {
+                        //มัน add ข้อมูลด้านขวาแล้วไป dual index ต่อไปเลย
+                        isLeft = true;
+                        dualIndex++;
+                    }
+                }
+
+                i++;
+            }
+        }
+
+
+        return realDisplayDualPage;
+    }
+
+    private void dualDisplaysAddNewEmptyItem(int dualIndex) {
+        while (this.dualPageDisplays.size() <= dualIndex) {
+            this.dualPageDisplays.add(new DualPageDisplay(-1, -1));
+        }
+    }
+
     //คำนวนหน้าที่จะต้องติดกัน
+    /*
     private void calcDualPages() {
         this.dualPageDisplays.clear(); //ลบของเก่าออกให้หมด
         int pageCount = this.getPagesCount();
@@ -266,12 +389,8 @@ public class PdfFile {
             }
         }
 
-        /*
-        for (DualPageDisplay d : dualPageDisplays) {
-            Log.d("XX", "KK " + d.debug());
-        }
-        */
-    }
+
+    }*/
 
     public int getPagesCount() {
         return pagesCount;
