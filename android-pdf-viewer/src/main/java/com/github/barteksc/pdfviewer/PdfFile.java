@@ -330,7 +330,10 @@ public class PdfFile {
     }
 
     private void dualDisplaysAddNewEmptyItem(int dualIndex) {
-        f
+        while (this.dualPageDisplays.size() <= dualIndex) {
+            this.dualPageDisplays.add(new DualPageDisplay(-1, -1));
+        }
+
     }
 
     //คำนวนหน้าที่จะต้องติดกัน
