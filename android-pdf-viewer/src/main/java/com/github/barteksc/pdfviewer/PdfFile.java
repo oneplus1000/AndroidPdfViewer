@@ -249,16 +249,14 @@ public class PdfFile {
             boolean isRight = true;
             while (i >= 0) {
                 boolean isBreak = false;
-                if (isRight) {
-                    if (breaks.contains(pageCount - i) || this.pageSizes.get(i).getWidth() > halfOfView) {
+                // เช็คการ break
+                if (breaks.contains(pageCount - i) || this.pageSizes.get(i).getWidth() > halfOfView) {
+                    if (isRight) {
                         isBreak = true;
-                    }
-                } else {
-                    if (breaks.contains(pageCount - i) || this.pageSizes.get(i).getWidth() > halfOfView) {
+                    } else {
                         dualIndex++;
                     }
                 }
-
                 //add to dualPageDisplays
                 this.dualDisplaysAddNewEmptyItem(dualIndex);
                 if (isRight) {
@@ -266,7 +264,6 @@ public class PdfFile {
                 } else {
                     this.dualPageDisplays.get(dualIndex).setPageLeft(i);
                 }
-
                 //คำนวนว่าจะต้องโดดหรือไม่โดดไป dualIndex ต่อไป
                 if (isBreak) {
                     //มัน add ข้อมูลด้านขวาแล้วไป dual index ต่อไปเลย
@@ -292,15 +289,15 @@ public class PdfFile {
             boolean isLeft = true;
             while (i < pageCount) {
                 boolean isBreak = false;
-                if (isLeft) {
-                    if (breaks.contains(i + 1) || this.pageSizes.get(i).getWidth() > halfOfView) {
+                // เช็คการ break
+                if (breaks.contains(i + 1) || this.pageSizes.get(i).getWidth() > halfOfView) {
+                    if (isLeft) {
                         isBreak = true;
-                    }
-                } else {
-                    if (breaks.contains(i + 1) || this.pageSizes.get(i).getWidth() > halfOfView) {
+                    } else {
                         dualIndex++;
                     }
                 }
+
                 //add to dualPageDisplays
                 this.dualDisplaysAddNewEmptyItem(dualIndex);
                 if (isLeft) {
@@ -333,9 +330,7 @@ public class PdfFile {
     }
 
     private void dualDisplaysAddNewEmptyItem(int dualIndex) {
-        while (this.dualPageDisplays.size() <= dualIndex) {
-            this.dualPageDisplays.add(new DualPageDisplay(-1, -1));
-        }
+        f
     }
 
     //คำนวนหน้าที่จะต้องติดกัน
