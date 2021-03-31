@@ -1,6 +1,8 @@
 package com.github.barteksc.pdfviewer.model;
 
 
+import android.util.Log;
+
 import java.util.List;
 
 public class DualPageDisplay {
@@ -41,6 +43,7 @@ public class DualPageDisplay {
     static public int findIndexByPage(List<DualPageDisplay> dualPageDisplays, int pageLeftOrRight) {
         int i = 0;
         for (DualPageDisplay d : dualPageDisplays) {
+            //Log.d("XX2"," i = "+i+"   pageLeft:"+d.pageLeft + "  pageRight:"+d.pageRight);
             if (d.pageLeft == pageLeftOrRight || d.pageRight == pageLeftOrRight) {
                 return i;
             }
