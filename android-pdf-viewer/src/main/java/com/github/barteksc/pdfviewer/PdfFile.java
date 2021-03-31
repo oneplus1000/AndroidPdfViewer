@@ -158,7 +158,6 @@ public class PdfFile {
             if (pageSize.getHeight() > originalMaxHeightPageSize.getHeight()) {
                 originalMaxHeightPageSize = pageSize;
             }
-            //Log.d("XX1", " " + i + "  " + pageSize.getWidth());
             originalPageSizes.add(pageSize);
         }
 
