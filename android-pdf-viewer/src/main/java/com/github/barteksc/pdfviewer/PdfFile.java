@@ -210,6 +210,29 @@ public class PdfFile {
         }*/
         //คำนวนแบบใหม่
         this.realDisplayDualPageType = this.calcDualPages(viewSize);
+        if (this.requestDisplayDualPageType == PDFView.Configurator.REQUEST_DISPLAY_DUALPAGE_TYPE_SHOW_DUAL_PAGE_IF_IT_CAN) {
+            //ถ้าเป็นหน้าคู่จะต้องปรับ size ของหน้าจอใหม่
+            PageSizeCalculator calculatorForDual = new PageSizeCalculator(pageFitPolicy, new Size(originalMaxWidthPageSize.getWidth() / 2, originalMaxWidthPageSize.getHeight()),
+                    new Size(originalMaxHeightPageSize.getWidth() / 2, originalMaxHeightPageSize.getHeight()),new Size( viewSize.getWidth() / 2, viewSize.getHeight()), fitEachPage);
+            for (DualPageDisplay display : this.dualPageDisplays) {
+                int count = 0;
+                if (display.getPageLeft() != -1) {
+                    count++;
+                }
+                if (display.getPageRight() != -1) {
+                    count++;
+                }
+                if (count == 2) {
+                    Size fullSizeL = originalPageSizes.get(display.getPageLeft());
+                    SizeF pageSizeL = calculatorForDual.calculate(fullSizeL);
+                    this.pageSizes.set(display.getPageLeft(), pageSizeL);
+
+                    Size fullSizeR = originalPageSizes.get(display.getPageRight());
+                    SizeF pageSizeR = calculatorForDual.calculate(fullSizeR);
+                    this.pageSizes.set(display.getPageRight(), pageSizeR);
+                }
+            }
+        }
 
 
         if (autoSpacing) {
@@ -249,7 +272,7 @@ public class PdfFile {
             while (i >= 0) {
                 boolean isBreak = false;
                 // เช็คการ break
-                if (breaks.contains(pageCount - i) || this.pageSizes.get(i).getWidth() > halfOfView) {
+                if (breaks.contains(pageCount - i) /*|| this.pageSizes.get(i).getWidth() > halfOfView*/) {
                     if (isRight) {
                         isBreak = true;
                     } else {
@@ -289,7 +312,7 @@ public class PdfFile {
             while (i < pageCount) {
                 boolean isBreak = false;
                 // เช็คการ break
-                if (breaks.contains(i + 1) || this.pageSizes.get(i).getWidth() > halfOfView) {
+                if (breaks.contains(i + 1) /*|| this.pageSizes.get(i).getWidth() > halfOfView*/) {
                     if (isLeft) {
                         isBreak = true;
                     } else {
